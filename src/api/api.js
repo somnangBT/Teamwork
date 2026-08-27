@@ -1,6 +1,7 @@
 import { useAuthStore } from "@/stores/auth";
 import axios from "axios";
 import Cookies from "js-cookie"; // For client-side access token management
+import { setupMockApi } from "./mock";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
@@ -12,6 +13,8 @@ const api = axios.create({
     },
     withCredentials: true
 });
+
+setupMockApi(api);
 
 function decodeJwtPayload(token) {
     try {

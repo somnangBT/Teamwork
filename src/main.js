@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import './assets/css/variables.css'
@@ -6,15 +7,56 @@ import './assets/css/main.css'
 
 import App from './App.vue'
 import router from './router'
+import { getAuthImageUrl } from './utils/imageUrl'
+
+const app = createApp(App)
+app.config.globalProperties.$authImg = getAuthImageUrl
+
+// Register Base Components Globally
+import BaseInput from './components/base/BaseInput.vue'
+import BaseButton from './components/base/BaseButton.vue'
+import BaseModal from './components/base/BaseModal.vue'
+import BasePagination from './components/base/BasePagination.vue'
+import BaseTable from './components/base/BaseTable.vue'
+import BaseStat from './components/base/BaseStat.vue'
+import BaseDrawer from './components/base/BaseDrawer.vue'
+import BaseToast from './components/base/BaseToast.vue'
+import BaseSelect from './components/base/BaseSelect.vue'
+import BaseSelectButton from './components/base/BaseSelectButton.vue'
+import BaseDatePicker from './components/base/BaseDatePicker.vue'
+import BaseToggle from './components/base/BaseToggle.vue'
+import BaseFileUpload from './components/base/BaseFileUpload.vue'
+import BaseAvatarUpload from './components/base/BaseAvatarUpload.vue'
+import BasePopOver from './components/base/BasePopOver.vue'
+import BaseFilter from './components/base/BaseFilter.vue'
+import BaseActionMenu from './components/base/BaseActionMenu.vue'
+import BaseBadge from './components/base/BaseBadge.vue'
+
+app.component('BaseInput', BaseInput)
+app.component('BaseButton', BaseButton)
+app.component('BaseModal', BaseModal)
+app.component('BasePagination', BasePagination)
+app.component('BaseTable', BaseTable)
+app.component('BaseStat', BaseStat)
+app.component('BaseDrawer', BaseDrawer)
+app.component('BaseToast', BaseToast)
+app.component('BaseSelect', BaseSelect)
+app.component('BaseSelectButton', BaseSelectButton)
+app.component('BaseDatePicker', BaseDatePicker)
+app.component('BaseToggle', BaseToggle)
+app.component('BaseFileUpload', BaseFileUpload)
+app.component('BaseAvatarUpload', BaseAvatarUpload)
+app.component('BasePopOver', BasePopOver)
+app.component('BaseFilter', BaseFilter)
+app.component('BaseActionMenu', BaseActionMenu)
+app.component('BaseBadge', BaseBadge)
+
+import Tooltip from 'primevue/tooltip'
+app.directive('tooltip', Tooltip)
 
 import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura'
 import { definePreset } from '@primeuix/themes'
-
-import { createPinia } from 'pinia'
-
-const app = createApp(App)
-app.use(createPinia())
 
 const MyCustomPreset = definePreset(Aura, {
     semantic: {
@@ -37,11 +79,12 @@ const MyCustomPreset = definePreset(Aura, {
     },
 })
 
+app.use(createPinia())
 app.use(PrimeVue, {
     theme: {
         preset: MyCustomPreset,
     }
 })
-
 app.use(router)
+
 app.mount('#app')

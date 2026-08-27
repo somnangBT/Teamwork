@@ -56,43 +56,37 @@ const router = createRouter({
           path: 'dashboard',
           name: 'admin-dashboard',
           meta: { title: 'Dashboard' },
-          component: () => import('../views/admin/AdminDashboard.vue')
+          component: () => import('../views/admin/dashboard/OverviewView.vue')
         },
         {
-          path: 'bookings',
-          name: 'admin-bookings',
-          meta: { title: 'Appointments' },
-          component: () => import('../views/admin/AdminBookings.vue')
+          path: 'user',
+          name: 'admin-user',
+          meta: { title: 'Users Management' },
+          component: () => import('../views/admin/dashboard/users/UserView.vue')
         },
         {
-          path: 'services',
-          name: 'admin-services',
-          meta: { title: 'Services & Care' },
-          component: () => import('../views/admin/AdminServices.vue')
+          path: 'report',
+          name: 'admin-report',
+          meta: { title: 'Feedback & Reports' },
+          component: () => import('../views/admin/dashboard/reports/ReportView.vue')
         },
         {
-          path: 'products',
-          name: 'admin-products',
-          meta: { title: 'Supplies & Retail' },
-          component: () => import('../views/admin/AdminProducts.vue')
+          path: 'survey',
+          name: 'admin-survey',
+          meta: { title: 'Surveys Management' },
+          component: () => import('../views/admin/dashboard/surveys/SurveyView.vue')
         },
         {
-          path: 'orders',
-          name: 'admin-orders',
-          meta: { title: 'Orders & Sales' },
-          component: () => import('../views/admin/AdminOrders.vue')
+          path: 'room',
+          name: 'admin-room',
+          meta: { title: 'Rooms Management' },
+          component: () => import('../views/admin/dashboard/rooms/RoomView.vue')
         },
         {
-          path: 'customers',
-          name: 'admin-customers',
-          meta: { title: 'Patients & Pets' },
-          component: () => import('../views/admin/AdminCustomers.vue')
-        },
-        {
-          path: 'staff',
-          name: 'admin-staff',
-          meta: { title: 'Specialists & Staff' },
-          component: () => import('../views/admin/AdminStaff.vue')
+          path: 'settings',
+          name: 'admin-settings',
+          meta: { title: 'Profile Settings' },
+          component: () => import('../views/admin/dashboard/SettingsView.vue')
         }
       ]
     }
