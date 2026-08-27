@@ -1,0 +1,357 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600;1,700&display=swap');
+@import './variables.css';
+
+body {
+    background-color: var(--body-bg-color, #ffffff);
+    font-family: 'Poppins', 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body.tnak-theme {
+    background-color: var(--surface-ground, #f1f5f9);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.brand-icon {
+    font-family: 'Poppins', 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.text-success {
+    color: var(--success-color) !important;
+}
+
+.text-warning {
+    color: var(--warning-color) !important;
+}
+
+.text-danger {
+    color: var(--danger-color) !important;
+}
+
+.text-info {
+    color: var(--info-color) !important;
+}
+
+.text-base {
+    color: var(--text-base);
+}
+
+.text-white {
+    color: var(--text-white);
+}
+
+.bg-success {
+    background-color: var(--success-color) !important;
+}
+
+section {
+    padding-block: var(--section-padding);
+}
+
+.card .card-footer,
+.card .card-header,
+.card .card-body {
+    border-radius: var(--border-inner-radius) !important;
+    border: none;
+}
+
+.card {
+    border: none !important;
+    border-radius: var(--border-radius);
+}
+
+.cta-btn {
+    border: none;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 15px;
+    background-color: var(--primary-color);
+    border-radius: var(--border-radius);
+    color: #fff;
+    text-decoration: none;
+}
+
+.section-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+}
+
+.section-title h2 {
+    font-size: 44px;
+    line-height: 55px;
+}
+
+.text-subheading {
+    text-align: center;
+    font-size: 20px;
+    line-height: 32px;
+    max-width: 1030px;
+}
+
+.truncate-1-line,
+.truncate-2-lines,
+.truncate-3-lines {
+    min-width: 200px;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-wrap: wrap;
+}
+
+.truncate-3-lines {
+    max-width: var(--truncate-3-lines-width);
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+}
+
+.truncate-2-lines {
+    max-width: var(--truncate-2-lines-width);
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+}
+
+.truncate-1-line {
+    min-width: 150px;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    max-width: var(--truncate-1-lines-width);
+}
+
+/* Global Responsive Typography */
+@media (max-width: 991px) {
+    .section-title h2 {
+        font-size: 36px;
+        line-height: 46px;
+    }
+
+    .text-subheading {
+        font-size: 18px;
+        line-height: 28px;
+    }
+}
+
+@media (max-width: 768px) {
+    .section-title h2 {
+        font-size: 28px;
+        line-height: 38px;
+    }
+
+    .text-subheading {
+        font-size: 16px;
+        line-height: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .section-title h2 {
+        font-size: 24px;
+        line-height: 32px;
+    }
+
+    .text-subheading {
+        font-size: 15px;
+        line-height: 22px;
+    }
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-label);
+}
+
+.dot-status {
+    width: 6px;
+    height: 6px;
+    border-radius: 50px;
+}
+
+#nprogress .bar {
+    background: var(--primary-color) !important;
+    height: 2px !important;
+}
+
+.main-divider {
+    height: 1px;
+    background-color: var(--border-clr, rgba(15, 23, 42, 0.08));
+    width: 100%;
+}
+
+/* TNAK Design System Reusable Components */
+.tnak-card {
+    background-color: #ffffff;
+    border-radius: var(--border-radius, 10px);
+    border: 1px solid var(--border-clr, rgba(15, 23, 42, 0.08)) !important;
+}
+
+.tnak-control {
+    height: var(--control-height, 42px);
+    border-radius: 8px;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    padding: 0.45rem 0.8rem;
+    background-color: #ffffff;
+    color: var(--text-heading-color, #0f172a);
+    font-size: 0.88rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.awwwards-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0.35rem 0.85rem;
+    background-color: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    border-radius: 8px;
+    color: var(--text-heading-color, #0f172a);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.awwwards-pill:hover {
+    background-color: var(--surface-ground, #f8fafc);
+    border-color: var(--border-hover-color, #94a3b8);
+    color: var(--text-heading-color, #0f172a);
+}
+
+.awwwards-pill.active {
+    background-color: var(--primary-color-soft, rgba(234, 122, 56, 0.12));
+    border-color: var(--primary-color, #EA7A38);
+    color: var(--primary-color, #EA7A38);
+    font-weight: 600;
+}
+
+.tnak-control:focus {
+    border-color: var(--primary-color, #EA7A38);
+    box-shadow: 0 0 0 3px rgba(234, 122, 56, 0.15);
+    background-color: #ffffff;
+}
+
+.btn-tnak-primary {
+    background-color: var(--primary-color, #EA7A38);
+    color: #ffffff;
+    border: 1px solid var(--primary-color, #EA7A38);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-tnak-primary:hover {
+    background-color: var(--primary-color-dark, #D96928);
+    color: #ffffff;
+}
+
+.btn-tnak-outline {
+    background-color: #ffffff;
+    color: var(--text-base, #334155);
+    border: 1px solid rgba(15, 23, 42, 0.15);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-tnak-outline:hover {
+    background-color: var(--surface-ground, #f8fafc);
+    border-color: var(--border-hover-color, #94a3b8);
+    color: var(--text-heading-color, #0f172a);
+}
+
+.btn-tnak-danger {
+    background-color: var(--danger-color, #ef4444);
+    color: #ffffff;
+    border: 1px solid var(--danger-color, #ef4444);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.btn-tnak-danger:hover {
+    background-color: #dc2626;
+    color: #ffffff;
+}
+
+.btn-tnak-danger-sm {
+    background-color: var(--danger-color, #ef4444);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.28rem 0.65rem;
+    font-size: 0.76rem;
+    font-weight: 600;
+    transition: background-color 0.15s ease;
+}
+
+.btn-tnak-danger-sm:hover {
+    background-color: #dc2626;
+}
+
+.tnak-status-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    letter-spacing: 0.02em;
+}
+
+.status-badge-success {
+    background-color: rgba(13, 148, 103, 0.12);
+    color: var(--success-color, #0d9467);
+    border: 1px solid rgba(13, 148, 103, 0.25);
+}
+
+.status-badge-warning {
+    background-color: rgba(245, 158, 11, 0.12);
+    color: var(--warning-color, #d97706);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.status-badge-danger {
+    background-color: rgba(239, 68, 68, 0.12);
+    color: var(--danger-color, #ef4444);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* Custom Max-Width App Container (Exactly matching floating navbar width) */
+.app-container {
+    width: calc(100% - 32px);
+    max-width: 1248px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+@media (max-width: 576px) {
+    .app-container {
+        width: 100%;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}
