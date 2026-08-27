@@ -24,7 +24,11 @@
             :maxDate="internalMaxDate"
             @blur="$emit('blur', $event)" 
             @focus="$emit('focus', $event)"
-        />
+        >
+            <template v-for="(_, name) in $slots" #[name]="slotData">
+                <slot :name="name" v-bind="slotData" />
+            </template>
+        </DatePicker>
 
         <small v-if="error" class="text-danger mt-1 d-block">{{ error }}</small>
         <small v-else-if="hint" class="text-muted mt-1 d-block">{{ hint }}</small>

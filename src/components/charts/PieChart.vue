@@ -91,7 +91,7 @@ const getThemeColor = (varName, fallback) => {
     return val || fallback;
 };
 
-const fallbackLabels = ['Students', 'Teachers', 'Admins'];
+const fallbackLabels = ['Clients', 'Specialists', 'Admins'];
 const fallbackData = [540, 325, 135];
 
 const mergedChartData = computed(() => {

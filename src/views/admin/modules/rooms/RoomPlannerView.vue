@@ -10,7 +10,14 @@
           </div>
 
           <div class="calendar-wrapper overflow-hidden">
-            <BaseDatePicker inline v-model="selectedDate" />
+            <BaseDatePicker inline v-model="selectedDate">
+              <template #date="slotProps">
+                <div class="position-relative d-flex align-items-center justify-content-center w-100 h-100">
+                  <span>{{ slotProps.date.day }}</span>
+                  <span v-if="hasBooking(slotProps.date)" class="calendar-dot"></span>
+                </div>
+              </template>
+            </BaseDatePicker>
           </div>
 
           <div class="mt-4 info-panel p-3 rounded-3">
@@ -242,7 +249,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue';
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue';
 import { useRoomStore } from '@/stores/rooms/room';
 import { useRoomScheduleStore } from '@/stores/rooms/roomSchedule';
 import {
@@ -250,6 +257,8 @@ import {
   School, User, Clock, Info, Tag
 } from '@lucide/vue';
 import DashboardEmptyData from '@/components/common/DashboardEmptyData.vue';
+import api from '@/api/api';
+import { socket } from '@/utils/socket';
 
 const emit = defineEmits(['new-session', 'edit-session', 'new-schedule']);
 
@@ -270,6 +279,41 @@ const getTodayString = () => {
 const selectedDate = ref(getTodayString());
 const selectedRoomId = ref('');
 const selectedSession = ref('');
+
+const bookedDates = ref(new Set());
+
+const loadBookedDates = async () => {
+  try {
+    const [schedulesRes, sessionsRes] = await Promise.all([
+      api.get('room-schedules', { params: { _per_page: 1000 } }),
+      api.get('room-sessions', { params: { _per_page: 1000 } })
+    ]);
+
+    const schedules = schedulesRes?.data?.data?.schedule || [];
+    const sessions = sessionsRes?.data?.data?.data || [];
+
+    const dates = new Set();
+    schedules.forEach(s => {
+      if (s.date) dates.add(s.date);
+    });
+    sessions.forEach(s => {
+      if (s.date) dates.add(s.date);
+    });
+
+    bookedDates.value = dates;
+  } catch (e) {
+    console.error("Failed to load booked dates:", e);
+  }
+};
+
+const hasBooking = (dateObj) => {
+  if (!dateObj) return false;
+  const y = dateObj.year;
+  const m = String(dateObj.month + 1).padStart(2, '0');
+  const d = String(dateObj.day).padStart(2, '0');
+  const dateStr = `${y}-${m}-${d}`;
+  return bookedDates.value.has(dateStr);
+};
 
 // Room options populated from store
 const roomOptions = computed(() => {
@@ -377,9 +421,27 @@ onMounted(async () => {
   await roomScheduleStore.getAllRoomScheduleType();
   // Initial fetch for schedules and sessions
   await loadData();
+  await loadBookedDates();
   // Enable real-time updates
   roomStore.setupSocketListeners();
   roomScheduleStore.setupSocketListeners();
+
+  // Listen to socket events to update calendar indicators in real-time
+  socket.on('room_schedule:created', loadBookedDates);
+  socket.on('room_schedule:updated', loadBookedDates);
+  socket.on('room_schedule:deleted', loadBookedDates);
+  socket.on('room_session:created', loadBookedDates);
+  socket.on('room_session:updated', loadBookedDates);
+  socket.on('room_session:deleted', loadBookedDates);
+});
+
+onUnmounted(() => {
+  socket.off('room_schedule:created', loadBookedDates);
+  socket.off('room_schedule:updated', loadBookedDates);
+  socket.off('room_schedule:deleted', loadBookedDates);
+  socket.off('room_session:created', loadBookedDates);
+  socket.off('room_session:updated', loadBookedDates);
+  socket.off('room_session:deleted', loadBookedDates);
 });
 
 // Action methods
@@ -396,6 +458,7 @@ const handleDeleteSession = async (id) => {
   const res = await roomStore.deleteRoomSession(id);
   if (res !== false) {
     await loadData();
+    await loadBookedDates();
   }
 };
 
@@ -408,6 +471,7 @@ const onUpdateScheduleStatus = async (schedule, newStatus) => {
   const res = await roomScheduleStore.updateRoomScheduleStatus(schedule.id, { status: newStatus });
   if (res) {
     await loadData();
+    await loadBookedDates();
   }
 };
 
@@ -425,6 +489,7 @@ const confirmDeleteSchedule = async () => {
       showDeleteModal.value = false;
       scheduleIdToDelete.value = null;
       await loadData();
+      await loadBookedDates();
     }
   } finally {
     isDeletingSchedule.value = false;
@@ -619,5 +684,21 @@ const confirmDeleteSchedule = async () => {
 
 .list-move {
   transition: transform 0.3s ease;
+}
+
+.calendar-dot {
+  position: absolute;
+  bottom: 2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+:deep(.p-datepicker-day-selected) .calendar-dot,
+:deep(.p-datepicker-today) .calendar-dot {
+  background-color: #ffffff !important;
 }
 </style>
