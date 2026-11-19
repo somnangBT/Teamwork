@@ -2,7 +2,7 @@
   <div class="product-page-container">
     <!-- Full-Width Split Hero Band (stays side-by-side across all viewports) -->
     <section class="product-hero-band border-bottom d-flex align-items-center">
-      <div class="app-container py-2 py-md-3 w-100">
+      <div class="app-container py-2 py-md-3">
         <div class="product-hero-row d-flex align-items-center justify-content-between">
           <!-- Left: Botanical Accent + Page Title + Breadcrumb -->
           <div class="product-hero-copy">

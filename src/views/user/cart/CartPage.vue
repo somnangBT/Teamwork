@@ -2,7 +2,7 @@
   <div class="cart-layout-container">
     <!-- Top Banner Header (Clean Split Hero staying side-by-side across all viewports) -->
     <section class="cart-hero-band border-bottom d-flex align-items-center">
-      <div class="app-container py-2 py-md-3 w-100">
+      <div class="app-container py-2 py-md-3">
         <div class="cart-hero-row d-flex align-items-center justify-content-between">
           <div class="cart-hero-copy">
             <div class="cart-hero-accent mb-1 mb-sm-2" aria-hidden="true">

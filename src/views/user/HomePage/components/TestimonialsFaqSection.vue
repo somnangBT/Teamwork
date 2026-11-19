@@ -28,7 +28,7 @@
       </div>
 
       <!-- FAQ & CTA Split -->
-      <div ref="faqSplitRef" class="row g-4 align-items-stretch mb-5">
+      <div ref="faqSplitRef" class="row g-4 align-items-start mb-5">
         <div class="col-12 col-lg-7 d-flex flex-column">
           <div class="mb-3">
             <span class="badge-tag-pill d-inline-block mb-2">FAQ</span>
@@ -36,7 +36,7 @@
             <p class="text-muted small mb-0">{{ t('home.faqSubtitle') }}</p>
           </div>
 
-          <div class="faq-stack d-flex flex-column gap-2 flex-grow-1 justify-content-between">
+          <div class="faq-stack d-flex flex-column gap-3">
             <details
               v-for="(item, idx) in faqs"
               :key="item.q"
@@ -59,7 +59,7 @@
         </div>
 
         <div class="col-12 col-lg-5 d-flex">
-          <article class="cta-showcase-card rounded-4 border overflow-hidden w-100 d-flex flex-column justify-content-between">
+          <article class="cta-showcase-card rounded-4 border overflow-hidden w-100 d-flex flex-column">
             <div class="cta-media-wrap position-relative">
               <img
                 src="/images/salon_hero.jpg"
@@ -73,7 +73,7 @@
               </span>
             </div>
 
-            <div class="p-4 d-flex flex-column flex-grow-1 justify-content-between gap-3">
+            <div class="p-4 d-flex flex-column gap-3">
               <div>
                 <h3 class="h4 fw-bold mb-2 section-heading">{{ t('home.ctaTitle') }}</h3>
                 <p class="text-muted small mb-3" style="line-height: 1.6;">
@@ -96,7 +96,7 @@
                 </ul>
               </div>
 
-              <div class="cta-actions-grid pt-2 border-top">
+              <div class="cta-actions-grid pt-3 border-top mt-1">
                 <router-link
                   to="/booking"
                   class="btn-cta-solid rounded-pill px-3 py-2 fw-bold text-decoration-none text-center"
@@ -221,7 +221,7 @@ import { useI18n } from '../../../../composables/useI18n'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const { t } = useI18n()
+const { t, isKhmer } = useI18n()
 
 const sectionRef = ref(null)
 const reviewsRowRef = ref(null)
@@ -284,7 +284,24 @@ const reviews = [
   }
 ]
 
-const faqs = [
+const faqs = computed(() => isKhmer.value ? [
+  {
+    q: 'តើខ្ញុំគួរមកដល់មុនម៉ោងប៉ុន្មានសម្រាប់ការកក់សេវាកម្ម?',
+    a: 'សូមមកដល់មុនម៉ោងកក់ប្រហែល ៥ ទៅ ១០ នាទី ដើម្បីរីករាយជាមួយតែរុក្ខជាតិ និងពិគ្រោះយោបល់អំពីសក់ និងស្បែកជាមួយអ្នកជំនាញ។'
+  },
+  {
+    q: 'តើផលិតផលថែរក្សាសក់ និងផ្ទៃមុខមានសុវត្ថិភាពសម្រាប់ស្បែកងាយប្រតិកម្មទេ?',
+    a: 'ពិតជាមានសុវត្ថិភាព! ផលិតផលទាំងអស់ត្រូវបានផ្សំពីរុក្ខជាតិធម្មជាតិ គ្មានជាតិកាត់ សារធាតុស៊ុលហ្វាត ឬប៉ារ៉ាបែនឡើយ។'
+  },
+  {
+    q: 'តើខ្ញុំអាចផ្លាស់ប្តូរពេលវេលា ឬបោះបង់ការកក់តាមអនឡាញបានទេ?',
+    a: 'បាទ/ចាសបាន! លោកអ្នកអាចចូលទៅកាន់ទំព័រ «ការកក់របស់ខ្ញុំ» ដើម្បីផ្លាស់ប្តូរម៉ោងថ្មី ឬលុបការកក់បានគ្រប់ពេលវេលា។'
+  },
+  {
+    q: 'តើមានសេវាដឹកជញ្ជូនឥតគិតថ្លៃសម្រាប់ផលិតផលសម្រស់ទេ?',
+    a: 'ការបញ្ជាទិញចាប់ពី $100 ឡើងទៅ នឹងទទួលបានការដឹកជញ្ជូនរហ័សដោយឥតគិតថ្លៃ ឬអាចមកទទួលផ្ទាល់នៅហាងបាន។'
+  }
+] : [
   {
     q: 'How early should I arrive for my salon appointment?',
     a: 'Please arrive 5–10 minutes before your scheduled slot so you can enjoy herbal tea and complete a quick hair & skin consultation with your stylist.'
@@ -301,7 +318,7 @@ const faqs = [
     q: 'Do you offer free delivery for salon beauty products?',
     a: 'Orders over $100 qualify for complimentary express delivery, or you can pick up your order free at our salon counter during your visit.'
   }
-]
+])
 
 onMounted(() => {
   gsapCtx = gsap.context(() => {
@@ -446,6 +463,12 @@ onUnmounted(() => {
 .section-heading,
 .review-author {
   color: var(--text-heading-color, #0f172a);
+  letter-spacing: normal !important;
+}
+
+.faq-question-text {
+  letter-spacing: normal !important;
+  line-height: 1.45;
 }
 
 .badge-tag-pill {
