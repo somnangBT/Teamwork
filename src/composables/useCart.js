@@ -1,47 +1,27 @@
 import { ref, computed, watch } from 'vue'
 
-const STORAGE_KEY = 'tiki_shopping_cart'
+const STORAGE_KEY = 'tiki_beauty_cart_v2'
 
 const initialItems = [
   {
     id: 1,
-    title: 'Royal Canin Medium Adult Dry Food, 12 kg',
-    variant: '12 kg',
-    price: 54.99,
-    originalPrice: 64.99,
+    title: 'Aura Botanical Nourishing Shampoo (500ml)',
+    variant: '500ml • Hair Care',
+    price: 28.00,
+    originalPrice: 34.00,
     quantity: 1,
     isFavorite: false,
-    image: 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&q=80&w=400'
+    image: '/images/shampoo.jpg'
   },
   {
     id: 2,
-    title: 'Purina Pro Plan Adult Wet Food, 12 x 400g',
-    variant: '12 x 400g',
-    price: 18.49,
-    originalPrice: 21.99,
+    title: 'Aurélia Luxury Argan Hair Oil (100ml)',
+    variant: '100ml • Serums & Oils',
+    price: 36.00,
+    originalPrice: 42.00,
     quantity: 1,
     isFavorite: false,
-    image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=400'
-  },
-  {
-    id: 3,
-    title: 'Trixie Rubber Dumbbell Dog Toy, Medium',
-    variant: 'Medium',
-    price: 7.99,
-    originalPrice: 9.99,
-    quantity: 1,
-    isFavorite: false,
-    image: 'https://images.unsplash.com/photo-1535294435445-d7249524ef2e?auto=format&fit=crop&q=80&w=400'
-  },
-  {
-    id: 4,
-    title: 'N&D Comfort Dog Harness, Size M',
-    variant: 'Size M',
-    price: 24.90,
-    originalPrice: 29.90,
-    quantity: 1,
-    isFavorite: false,
-    image: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&q=80&w=400'
+    image: '/images/argan_oil.jpg'
   }
 ]
 
@@ -85,18 +65,18 @@ export function useCart() {
   })
 
   const productsCost = computed(() => {
-    return cartItems.value.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+    return cartItems.value.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0)
   })
 
-  const freeDeliveryThreshold = 120.0
+  const freeDeliveryThreshold = 100.0
   const deliveryCost = computed(() => {
-    if (productsCost.value >= freeDeliveryThreshold || cartItems.value.length === 0) return 0.00
-    return 2.99
+    if (productsCost.value >= freeDeliveryThreshold || cartItems.value.length === 0) return 0.0
+    return 3.99
   })
 
   const awayFromFreeDelivery = computed(() => {
     const diff = freeDeliveryThreshold - productsCost.value
-    return diff > 0 ? Math.round(diff) : 0
+    return diff > 0 ? Number(diff.toFixed(2)) : 0
   })
 
   const freeDeliveryProgress = computed(() => {
@@ -108,6 +88,31 @@ export function useCart() {
     const discounted = Math.max(0, productsCost.value - promoDiscount.value)
     return discounted + deliveryCost.value
   })
+
+  const addToCart = (product, qty = 1) => {
+    if (!product) return
+    const unitPrice =
+      typeof product.rawPrice === 'number'
+        ? product.rawPrice
+        : parseFloat(String(product.price || 0).replace(/[^0-9.]/g, '')) || 0
+
+    const existing = cartItems.value.find(i => i.id === product.id)
+    if (existing) {
+      existing.quantity += qty
+    } else {
+      cartItems.value.unshift({
+        id: product.id,
+        title: product.name || product.title,
+        variant: product.category || product.variant || 'Salon Care',
+        price: unitPrice,
+        originalPrice: Number((unitPrice * 1.15).toFixed(2)),
+        quantity: qty,
+        isFavorite: false,
+        image: product.image
+      })
+    }
+    saveCart()
+  }
 
   const increaseQuantity = (id) => {
     const item = cartItems.value.find(i => i.id === id)
@@ -132,24 +137,32 @@ export function useCart() {
     }
   }
 
+  const clearCart = () => {
+    cartItems.value = []
+    removePromo()
+    saveCart()
+  }
+
   const toggleFavorite = (id) => {
     const item = cartItems.value.find(i => i.id === id)
     if (item) item.isFavorite = !item.isFavorite
   }
 
   const applyPromo = (code) => {
-    if (code.trim().toUpperCase() === 'TIKI10') {
-      promoDiscount.value = 10.0
-      isPromoApplied.value = true
-      promoCode.value = 'TIKI10'
-      return { success: true, message: '10,00 € promo applied!' }
-    } else if (code.trim().toUpperCase() === 'GLOW15') {
-      promoDiscount.value = 15.0
-      isPromoApplied.value = true
-      promoCode.value = 'GLOW15'
-      return { success: true, message: '15,00 € discount applied!' }
+    const clean = String(code || '').trim().toUpperCase()
+    const promos = {
+      TIKI10: { discount: 10.0, message: '$10.00 promo discount applied!' },
+      GLOW15: { discount: 15.0, message: '$15.00 spa treat discount applied!' },
+      TIKIWELCOME: { discount: 15.0, message: '$15.00 welcome beauty credit applied!' },
+      GLOW20: { discount: 20.0, message: '$20.00 VIP beauty reward applied!' }
     }
-    return { success: false, message: 'Invalid promo code' }
+    if (promos[clean]) {
+      promoDiscount.value = promos[clean].discount
+      isPromoApplied.value = true
+      promoCode.value = clean
+      return { success: true, message: promos[clean].message }
+    }
+    return { success: false, message: 'Invalid promo code. Try TIKI10 or GLOW15.' }
   }
 
   const removePromo = () => {
@@ -169,9 +182,11 @@ export function useCart() {
     promoCode,
     promoDiscount,
     isPromoApplied,
+    addToCart,
     increaseQuantity,
     decreaseQuantity,
     removeItem,
+    clearCart,
     toggleFavorite,
     applyPromo,
     removePromo

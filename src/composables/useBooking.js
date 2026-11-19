@@ -1,6 +1,6 @@
 import { ref, computed, watch } from 'vue'
 
-const STORAGE_KEY = 'salon_customer_bookings'
+const STORAGE_KEY = 'salon_beauty_bookings_v2'
 
 // Global shared state across components
 const isBookingModalOpen = ref(false)
@@ -24,80 +24,80 @@ const loadBookings = () => {
         {
           id: 'BK-122795',
           serviceId: 1,
-          serviceTitle: 'Full Pet Grooming & Styling',
-          servicePrice: 65,
-          serviceDuration: '45 mins',
+          serviceTitle: 'Signature Haircut & Silk Blowout',
+          servicePrice: 55,
+          serviceDuration: '60 mins',
           specialistName: 'Elena Rostova',
-          specialistRole: 'Master Dog Groomer & Breed Stylist',
+          specialistRole: 'Creative Hair & Blowout Director',
           specialistAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
           date: new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0],
           time: '09:00 AM',
           customerName: 'Alisa Gitten',
-          petName: 'Bella',
-          petBreed: 'Golden Retriever',
+          petName: 'Soft Layered Waves',
+          petBreed: 'Argan Gloss Finish',
           customerEmail: 'alisa.gitten2910@gmail.com',
           customerPhone: '+4 079 355 05 86',
-          notes: 'Bella has a sensitive stomach, gentle organic shampoo please.',
+          notes: 'Prefer sulfate-free rosemary shampoo and light volume blowout.',
           status: 'Confirmed',
           createdAt: new Date().toISOString()
         },
         {
           id: 'BK-747770',
           serviceId: 2,
-          serviceTitle: 'Spa Hydro-Bath & Deshedding',
-          servicePrice: 45,
-          serviceDuration: '40 mins',
-          specialistName: 'Marcus Vance',
-          specialistRole: 'Cat Grooming & Sensitive Care Specialist',
-          specialistAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
+          serviceTitle: 'Herbal Botanical Head Spa & Steam',
+          servicePrice: 65,
+          serviceDuration: '50 mins',
+          specialistName: 'Sophia Laurent',
+          specialistRole: 'Botanical Head Spa & Facialist',
+          specialistAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
           date: new Date(Date.now() + 86400000 * 4).toISOString().split('T')[0],
           time: '02:00 PM',
-          customerName: 'Marcus Sterling',
-          petName: 'Milo',
-          petBreed: 'British Shorthair',
-          customerEmail: 'm.sterling@outlook.com',
-          customerPhone: '+4 079 482 11 02',
-          notes: 'Full deshedding coat blowout.',
+          customerName: 'Clara Oswald',
+          petName: 'Scalp Detox & Hydration',
+          petBreed: 'Sensitive Scalp',
+          customerEmail: 'clara.oswald@gmail.com',
+          customerPhone: '+4 078 911 34 22',
+          notes: 'Warm eucalyptus steam and relaxing temple massage.',
           status: 'In Progress',
           createdAt: new Date(Date.now() - 86400000 * 1).toISOString()
         },
         {
           id: 'BK-893112',
           serviceId: 5,
-          serviceTitle: 'VIP Royal Spa & Pampering Package',
-          servicePrice: 95,
-          serviceDuration: '75 mins',
-          specialistName: 'Sophia Laurent',
-          specialistRole: 'Pet Hydro-Spa & Aromatherapist',
-          specialistAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
+          serviceTitle: 'VIP Bridal & Royal Spa Package',
+          servicePrice: 125,
+          serviceDuration: '90 mins',
+          specialistName: 'Marcus Vance',
+          specialistRole: 'Balayage & Color Specialist',
+          specialistAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
           date: new Date(Date.now() - 86400000 * 1).toISOString().split('T')[0],
           time: '11:00 AM',
-          customerName: 'Clara Oswald',
-          petName: 'Daisy',
-          petBreed: 'Poodle',
-          customerEmail: 'clara.oswald@gmail.com',
-          customerPhone: '+4 078 911 34 22',
-          notes: 'Blueberry facial and extra bandana.',
+          customerName: 'Nadia Sokha',
+          petName: 'Glass-Skin & Silk Hair',
+          petBreed: 'Bridal Glow',
+          customerEmail: 'nadia.sokha@gmail.com',
+          customerPhone: '+4 079 482 11 02',
+          notes: 'Rosehip facial glow and silk blowout.',
           status: 'Done',
           createdAt: new Date(Date.now() - 86400000 * 3).toISOString()
         },
         {
           id: 'BK-452109',
           serviceId: 3,
-          serviceTitle: 'Nail Trimming & Paw Care',
-          servicePrice: 25,
-          serviceDuration: '20 mins',
+          serviceTitle: 'Gel Manicure & Botanical Nail Care',
+          servicePrice: 32,
+          serviceDuration: '45 mins',
           specialistName: 'Chloe Lin',
-          specialistRole: 'Puppy Care & Gentle Groomer',
+          specialistRole: 'Nail Artistry & Lash Stylist',
           specialistAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
           date: new Date(Date.now() + 86400000 * 1).toISOString().split('T')[0],
           time: '03:00 PM',
-          customerName: 'David Chen',
-          petName: 'Koko',
-          petBreed: 'Pomeranian Puppy',
-          customerEmail: 'david.chen@yahoo.com',
+          customerName: 'Mina Kim',
+          petName: 'Sheer Blush Gel Set',
+          petBreed: 'Almond Shape',
+          customerEmail: 'mina.kim@yahoo.com',
           customerPhone: '+4 077 123 44 88',
-          notes: 'First time puppy grooming visit.',
+          notes: 'Natural sheer pink tone with rosehip cuticle care.',
           status: 'Confirmed',
           createdAt: new Date().toISOString()
         }
@@ -127,7 +127,7 @@ watch(bookings, () => {
 loadBookings()
 
 export function useBooking() {
-  // Available Pet Grooming Specialists
+  // Available Women's Beauty & Hair Salon Specialists
   const specialists = ref([
     {
       id: 'any',
@@ -141,42 +141,42 @@ export function useBooking() {
     {
       id: 'elena',
       name: 'Elena Rostova',
-      role: 'Master Dog Groomer & Breed Stylist',
+      role: 'Creative Hair & Blowout Director',
       rating: 4.98,
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
       badge: 'DIRECTOR',
       experience: '8 years',
-      specialties: ['Breed Styling', 'Show Cuts', 'Full Deshedding']
+      specialties: ['Precision Cuts', 'Silk Blowouts', 'Bridal Updos']
     },
     {
       id: 'marcus',
       name: 'Marcus Vance',
-      role: 'Cat Grooming & Feline Specialist',
+      role: 'Balayage & Color Specialist',
       rating: 4.95,
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
-      badge: 'FELINE PRO',
+      badge: 'COLOR PRO',
       experience: '6 years',
-      specialties: ['Cat Styling', 'De-Matting', 'Gentle Handling']
+      specialties: ['Balayage', 'Gloss Toning', 'Keratin Repair']
     },
     {
       id: 'sophia',
       name: 'Sophia Laurent',
-      role: 'Pet Hydro-Spa & Aromatherapist',
+      role: 'Botanical Head Spa & Facialist',
       rating: 4.92,
       avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
       badge: 'SPA',
-      experience: '4 years',
-      specialties: ['Hydrotherapy', 'Aroma Spa', 'Skin Recovery']
+      experience: '5 years',
+      specialties: ['Herbal Head Spa', 'Radiance Facials', 'Aromatherapy']
     },
     {
       id: 'chloe',
       name: 'Chloe Lin',
-      role: 'Puppy Care & Gentle Groomer',
+      role: 'Nail Artistry & Lash Stylist',
       rating: 4.90,
       avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
-      badge: 'PUPPY CARE',
-      experience: '3 years',
-      specialties: ['Puppy First Visits', 'Nail Smooth Grind', 'Gentle Wash']
+      badge: 'NAILS & GLAM',
+      experience: '4 years',
+      specialties: ['Gel Manicure', 'Nail Art', 'Cuticle Therapy']
     }
   ])
 

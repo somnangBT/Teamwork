@@ -1,483 +1,613 @@
 <template>
   <div class="profile-layout-container position-relative">
-    
-    <!-- Background Decorative Organic Shape (Bottom Right Wave) -->
-    <div class="bg-decorative-blob blob-bottom-right pointer-events-none"></div>
-    
-    <div class="app-container position-relative z-1 pt-2 pb-5">
-      
-      <!-- Top Breadcrumb & Page Title -->
+    <div class="bg-decorative-blob blob-bottom-right pointer-events-none" aria-hidden="true"></div>
+
+    <div class="app-container position-relative z-1 pt-3 pb-5">
+      <!-- Breadcrumb & Title -->
       <div class="profile-header-group mb-3">
         <nav class="breadcrumb-nav mb-1" aria-label="breadcrumb">
           <router-link to="/" class="breadcrumb-link d-inline-flex align-items-center gap-1 text-decoration-none">
-            <span class="text-muted">‹ Home</span>
+            <span class="text-muted">‹ {{ t('nav.home') }}</span>
             <span class="text-muted opacity-50">/</span>
-            <span class="text-dark fw-semibold">Profile</span>
+            <span class="heading-text fw-semibold">{{ t('profile.title') }}</span>
           </router-link>
         </nav>
-        <h1 class="page-title fw-bolder text-dark m-0">Profile</h1>
+        <h1 class="page-title fw-bolder m-0">{{ t('profile.title') }}</h1>
       </div>
 
-      <!-- Main Two-Column Flex Layout -->
       <div class="profile-columns-layout d-flex flex-column flex-lg-row align-items-start">
-        
-        <!-- ========================================================= -->
-        <!-- LEFT SIDEBAR: PROFILE NAVIGATION MENU                     -->
-        <!-- ========================================================= -->
+        <!-- LEFT SIDEBAR -->
         <aside class="profile-sidebar-column flex-shrink-0">
-          <div class="profile-nav-card bg-white">
-            <nav class="d-flex flex-column">
-              
-              <button 
-                type="button" 
-                class="profile-sidebar-item d-flex align-items-center gap-2.5 text-start border-0"
-                :class="{ 'active': activeSection === 'account' }"
-                @click="scrollToSection('account')"
+          <div class="profile-nav-card">
+            <nav aria-label="Profile sections" class="d-flex flex-column">
+              <button
+                v-for="item in sidebarItems"
+                :key="item.id"
+                type="button"
+                class="profile-sidebar-item border-0 text-start"
+                :class="{ active: activeSection === item.id, 'support-highlight-item': item.id === 'support' }"
+                @click="scrollToSection(item.id)"
               >
-                <span class="nav-icon text-orange">👤</span>
-                <span class="item-text">Account</span>
+                <span class="nav-icon">{{ item.emoji }}</span>
+                <span class="item-text">{{ item.label }}</span>
               </button>
 
-              <button 
-                type="button" 
-                class="profile-sidebar-item d-flex align-items-center gap-2.5 text-start border-0"
-                :class="{ 'active': activeSection === 'pets' }"
-                @click="scrollToSection('pets')"
-              >
-                <span class="nav-icon">🐾</span>
-                <span class="item-text">My pets</span>
-              </button>
-
-              <button 
-                type="button" 
-                class="profile-sidebar-item d-flex align-items-center gap-2.5 text-start border-0"
-                :class="{ 'active': activeSection === 'vouchers' }"
-                @click="scrollToSection('vouchers')"
-              >
-                <span class="nav-icon">🎟️</span>
-                <span class="item-text">Vouchers</span>
-              </button>
-
-              <button 
-                type="button" 
-                class="profile-sidebar-item d-flex align-items-center gap-2.5 text-start border-0"
-                :class="{ 'active': activeSection === 'orders' }"
-                @click="scrollToSection('orders')"
-              >
-                <span class="nav-icon">🧾</span>
-                <span class="item-text">Order history</span>
-              </button>
-
-              <button 
-                type="button" 
-                class="profile-sidebar-item d-flex align-items-center gap-2.5 text-start border-0"
-                :class="{ 'active': activeSection === 'addresses' }"
-                @click="scrollToSection('addresses')"
-              >
-                <span class="nav-icon">📍</span>
-                <span class="item-text">My Addresses</span>
-              </button>
-
-              <button 
-                type="button" 
-                class="profile-sidebar-item d-flex align-items-center gap-2.5 text-start border-0"
-                :class="{ 'active': activeSection === 'billing' }"
-                @click="scrollToSection('billing')"
-              >
-                <span class="nav-icon">💳</span>
-                <span class="item-text">Billing information</span>
-              </button>
-
-              <!-- Large Gap Above Support & Logout -->
               <div class="sidebar-spacer"></div>
 
-              <button 
-                type="button" 
-                class="profile-sidebar-item support-highlight-item d-flex align-items-center gap-2.5 text-start border-0"
-                :class="{ 'active': activeSection === 'support' }"
-                @click="scrollToSection('support')"
-              >
-                <span class="nav-icon text-orange">💬</span>
-                <span class="item-text">Support</span>
-              </button>
-
-              <button 
-                type="button" 
-                class="profile-sidebar-item logout-item d-flex align-items-center gap-2.5 text-start border-0"
-                @click="handleLogout"
+              <button
+                type="button"
+                class="profile-sidebar-item logout-item border-0 text-start"
+                @click="showLogoutModal = true"
               >
                 <span class="nav-icon text-danger">🚪</span>
-                <span class="item-text text-danger">Log out</span>
+                <span class="item-text text-danger">{{ t('profile.logout') }}</span>
               </button>
-
             </nav>
           </div>
         </aside>
 
-        <!-- ========================================================= -->
-        <!-- RIGHT CONTENT: CARDS                                      -->
-        <!-- ========================================================= -->
+        <!-- RIGHT CONTENT CARDS -->
         <main class="profile-cards-column flex-grow-1 w-100">
-          
-          <!-- 1. ACCOUNT CARD -->
-          <section id="account" class="ref-card bg-white mb-4">
-            <h2 class="ref-card-title fw-bold text-dark mb-4">Account</h2>
-            
-            <div class="d-flex align-items-start gap-4">
-              <!-- Avatar -->
-              <img 
-                :src="account.avatar" 
-                alt="Alisa Gitten" 
-                class="account-avatar rounded-circle object-fit-cover flex-shrink-0"
+          <!-- 1. ACCOUNT -->
+          <section id="account" class="ref-card mb-4">
+            <h2 class="ref-card-title fw-bold mb-4">{{ t('profile.account') }}</h2>
+            <div class="d-flex align-items-start gap-4 flex-wrap">
+              <img
+                :src="account.avatar"
+                :alt="account.name"
+                class="account-avatar rounded-circle object-fit-cover flex-shrink-0 border"
               />
-
-              <!-- Account Details & Edit -->
               <div class="d-flex flex-column">
-                <strong class="account-name fw-bold text-dark mb-1">{{ account.name }}</strong>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <strong class="account-name fw-bold">{{ account.name }}</strong>
+                  <span class="pet-badge-orange fw-semibold">{{ account.tier || 'VIP' }}</span>
+                </div>
                 <span class="account-meta text-muted mb-1">{{ account.email }}</span>
                 <span class="account-meta text-muted mb-3">{{ account.phone }}</span>
 
                 <div>
-                  <button 
-                    type="button" 
-                    class="btn-edit-badge d-inline-flex align-items-center gap-1.5 border-0 fw-semibold"
+                  <button
+                    type="button"
+                    class="btn-edit-badge d-inline-flex align-items-center gap-1 border-0 fw-semibold"
                     @click="openEditAccountModal"
                   >
                     <span>✏️</span>
-                    <span>Edit</span>
+                    <span>Edit Profile</span>
                   </button>
                 </div>
               </div>
             </div>
           </section>
 
-          <!-- 2. MY PETS CARD -->
-          <section id="pets" class="ref-card bg-white mb-4">
-            <h2 class="ref-card-title fw-bold text-dark mb-3">My pets</h2>
+          <!-- 2. BEAUTY PROFILE -->
+          <section id="pets" class="ref-card mb-4">
+            <h2 class="ref-card-title fw-bold mb-3">{{ t('profile.pets') }}</h2>
 
-            <!-- Green Recommendation Banner -->
             <div v-if="showPetBanner" class="ref-green-banner d-flex align-items-center justify-content-between gap-3 mb-4">
               <span class="green-banner-text">
-                This helps us recommend better food, care products and special offers just for your pet 🐾
+                This helps us recommend tailored haircare, botanical facials, and salon styling treatments for your hair &amp; skin ✨
               </span>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 class="btn-close-green-circle border-0 d-flex align-items-center justify-content-center flex-shrink-0"
                 @click="showPetBanner = false"
-                title="Dismiss"
+                aria-label="Dismiss tip"
               >
                 ✕
               </button>
             </div>
 
-            <!-- Pet Inner Card List -->
             <div class="d-flex flex-column gap-3 mb-3">
-              <div 
-                v-for="pet in pets" 
-                :key="pet.id"
-                class="pet-inner-box"
-              >
-                <div class="d-flex align-items-start gap-3 gap-md-4">
-                  <!-- Pet Photo -->
-                  <img 
-                    :src="pet.photo" 
-                    :alt="pet.name" 
+              <div v-for="pet in pets" :key="pet.id" class="pet-inner-box">
+                <div class="d-flex flex-column flex-sm-row align-items-start gap-3 gap-md-4">
+                  <img
+                    :src="pet.photo"
+                    :alt="pet.name"
                     class="pet-photo rounded-4 object-fit-cover flex-shrink-0"
+                    style="object-position: center 20%;"
                   />
 
-                  <!-- Pet Details -->
-                  <div class="flex-grow-1">
-                    <h3 class="pet-title fw-bold text-dark mb-2">{{ pet.name }}</h3>
-
-                    <!-- Badges Row -->
-                    <div class="d-flex flex-wrap align-items-center gap-1.5 mb-3">
-                      <span class="pet-badge-orange fw-semibold">
-                        {{ pet.breed }}
-                      </span>
-                      <span class="pet-badge-white">
-                        {{ pet.type }}
-                      </span>
-                      <span class="pet-badge-white">
-                        {{ pet.age }}
-                      </span>
-                      <span class="pet-badge-white">
-                        {{ pet.gender }}
-                      </span>
-                    </div>
-
-                    <!-- 4 Attribute Boxes Row -->
-                    <div class="attributes-grid d-flex flex-wrap gap-2.5 mb-3">
-                      <!-- Weight -->
-                      <div class="attribute-pill-box d-flex align-items-center gap-2">
-                        <span class="attr-icon">🍞</span>
-                        <div>
-                          <span class="attr-label d-block">Weight</span>
-                          <strong class="attr-value text-dark d-block">{{ pet.weight }}</strong>
-                        </div>
-                      </div>
-
-                      <!-- Size -->
-                      <div class="attribute-pill-box d-flex align-items-center gap-2">
-                        <span class="attr-icon">📏</span>
-                        <div>
-                          <span class="attr-label d-block">Size</span>
-                          <strong class="attr-value text-dark d-block">{{ pet.size }}</strong>
-                        </div>
-                      </div>
-
-                      <!-- Diet -->
-                      <div class="attribute-pill-box d-flex align-items-center gap-2">
-                        <span class="attr-icon">🥚</span>
-                        <div>
-                          <span class="attr-label d-block">Diet</span>
-                          <strong class="attr-value text-dark d-block text-truncate" style="max-width: 90px;">{{ pet.diet }}</strong>
-                        </div>
-                      </div>
-
-                      <!-- Special Needs -->
-                      <div class="attribute-pill-box d-flex align-items-center gap-2">
-                        <span class="attr-icon">🧡</span>
-                        <div>
-                          <span class="attr-label d-block">Special needs</span>
-                          <strong class="attr-value text-dark d-block text-truncate" style="max-width: 105px;">{{ pet.specialNeeds }}</strong>
-                        </div>
+                  <div class="flex-grow-1 w-100">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                      <h3 class="pet-title fw-bold m-0">{{ pet.name }}</h3>
+                      <div class="d-flex align-items-center gap-2">
+                        <router-link to="/booking" class="btn-edit-badge text-decoration-none fw-semibold">
+                          ✨ Book Salon
+                        </router-link>
+                        <button
+                          type="button"
+                          class="btn-edit-badge border-0 fw-semibold"
+                          @click="openEditPetModal(pet)"
+                        >
+                          ✏️ Edit
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-danger rounded-3 py-1 px-2"
+                          aria-label="Delete beauty profile"
+                          @click="confirmDeletePet(pet)"
+                        >
+                          <Trash2 :size="13" />
+                        </button>
                       </div>
                     </div>
 
-                    <!-- Edit Pet Button -->
-                    <div>
-                      <button 
-                        type="button" 
-                        class="btn-edit-badge d-inline-flex align-items-center gap-1.5 border-0 fw-semibold"
-                        @click="openEditPetModal(pet)"
-                      >
-                        <span>✏️</span>
-                        <span>Edit</span>
-                      </button>
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                      <span class="pet-badge-orange fw-semibold">{{ pet.breed }}</span>
+                      <span class="pet-badge-white">{{ pet.type }}</span>
+                      <span class="pet-badge-white">{{ pet.age }}</span>
+                      <span class="pet-badge-white">{{ pet.gender }}</span>
                     </div>
 
+                    <div class="attributes-grid d-flex flex-wrap gap-2">
+                      <div class="attribute-pill-box d-flex align-items-center gap-2">
+                        <span>💇‍♀️</span>
+                        <div>
+                          <span class="attr-label d-block">Hair Length</span>
+                          <strong class="attr-value d-block">{{ pet.weight }}</strong>
+                        </div>
+                      </div>
+                      <div class="attribute-pill-box d-flex align-items-center gap-2">
+                        <span>✨</span>
+                        <div>
+                          <span class="attr-label d-block">Care Focus</span>
+                          <strong class="attr-value d-block">{{ pet.size }}</strong>
+                        </div>
+                      </div>
+                      <div class="attribute-pill-box d-flex align-items-center gap-2">
+                        <span>🌿</span>
+                        <div>
+                          <span class="attr-label d-block">Formula</span>
+                          <strong class="attr-value d-block text-truncate" style="max-width: 110px;">{{ pet.diet }}</strong>
+                        </div>
+                      </div>
+                      <div class="attribute-pill-box d-flex align-items-center gap-2">
+                        <span>🌸</span>
+                        <div>
+                          <span class="attr-label d-block">Preferences</span>
+                          <strong class="attr-value d-block text-truncate" style="max-width: 120px;">{{ pet.specialNeeds }}</strong>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Add Another Pet Button -->
-            <div>
-              <button 
-                type="button" 
-                class="btn-add-another-pet d-inline-flex align-items-center gap-1"
-                @click="openAddPetModal"
-              >
-                <span>+ Add another pet</span>
+            <button type="button" class="btn-add-another-pet d-inline-flex align-items-center gap-1" @click="openAddPetModal">
+              <span>+ Add another beauty profile</span>
+            </button>
+          </section>
+
+          <!-- 3. VOUCHERS -->
+          <section id="vouchers" class="ref-card mb-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+              <h2 class="ref-card-title fw-bold m-0">{{ t('profile.vouchers') }}</h2>
+              <button type="button" class="btn-voucher-orange border-0 fw-semibold" @click="showVoucherModal = true">
+                + Claim Voucher
               </button>
+            </div>
+
+            <div v-if="vouchers.length" class="row g-3">
+              <div v-for="v in vouchers" :key="v.id" class="col-12 col-md-6">
+                <div class="voucher-item-card p-3 rounded-4 border h-100 d-flex flex-column justify-content-between">
+                  <div>
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                      <span class="badge bg-orange-soft text-orange fw-bold px-2 py-1">{{ v.code }}</span>
+                      <span class="small text-muted">Min ${{ v.minSpend }}</span>
+                    </div>
+                    <h3 class="h6 fw-bold mb-1 heading-text">{{ v.title }}</h3>
+                    <p class="text-muted small mb-3">{{ v.description }}</p>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between pt-2 border-top">
+                    <span class="text-muted" style="font-size: 0.74rem;">Expires {{ v.expiresAt }}</span>
+                    <button type="button" class="btn-edit-badge border-0 fw-semibold" @click="applyVoucherToCart(v.code)">
+                      Use in Cart →
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div v-else class="text-center py-4 text-muted small">
+              No active vouchers yet. Claim <code>TIKIWELCOME</code> for $15 off!
             </div>
           </section>
 
-          <!-- 3. VOUCHERS CARD -->
-          <section id="vouchers" class="ref-card bg-white mb-4">
-            <h2 class="ref-card-title fw-bold text-dark mb-4">Vouchers</h2>
+          <!-- 4. ORDER HISTORY -->
+          <section id="orders" class="ref-card mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+              <h2 class="ref-card-title fw-bold m-0">{{ t('profile.orders') }}</h2>
+              <span class="badge bg-orange-soft text-orange fw-bold px-2 py-1 rounded-pill">{{ customerOrders.length }} orders</span>
+            </div>
 
-            <div class="d-flex flex-column flex-md-row align-items-center align-items-md-start gap-4">
-              <!-- Poodle Mascot Photo -->
-              <img 
-                src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                alt="Poodle mascot" 
-                class="voucher-poodle-img flex-shrink-0 object-fit-cover rounded-4"
-              />
+            <div v-if="customerOrders.length" class="d-flex flex-column gap-3">
+              <div v-for="ord in customerOrders" :key="ord.id" class="pet-inner-box border">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pb-2 mb-2 border-bottom">
+                  <div>
+                    <strong class="heading-text">{{ ord.orderNumber }}</strong>
+                    <span class="text-muted small ms-2">{{ formatDate(ord.createdAt) }}</span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    <BaseBadge :status="ord.status" size="sm" />
+                    <span class="fw-bold text-primary">${{ Number(ord.total).toFixed(2) }}</span>
+                  </div>
+                </div>
 
-              <!-- Voucher Description -->
-              <div class="flex-grow-1 text-center text-md-start pt-1">
-                <h3 class="voucher-heading fw-bold text-dark mb-2 d-flex align-items-center justify-content-center justify-content-md-start gap-1">
-                  <span>No vouchers yet</span>
-                  <span>🐾</span>
-                </h3>
-                <p class="voucher-desc text-muted mb-4">
-                  Looks like you don't have any vouchers right now.<br />
-                  But don't worry — we're always preparing something special for you and your pet 💚
-                </p>
+                <ul class="list-unstyled small text-muted mb-2">
+                  <li v-for="item in ord.items" :key="item.name" class="d-flex justify-content-between">
+                    <span>{{ item.quantity }}× {{ item.name }}</span>
+                    <span>${{ (item.price * item.quantity).toFixed(2) }}</span>
+                  </li>
+                </ul>
 
-                <button 
-                  type="button" 
-                  class="btn-voucher-orange border-0 fw-semibold"
-                  @click="openAddVoucherModal"
-                >
-                  + Add Voucher
-                </button>
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-2 border-top small">
+                  <span class="text-muted">{{ ord.paymentMethod }} · {{ ord.address }}</span>
+                  <router-link to="/products" class="text-primary fw-semibold text-decoration-none">
+                    Shop Again →
+                  </router-link>
+                </div>
+              </div>
+            </div>
+            <div v-else class="text-center py-4 text-muted small">
+              You haven't placed any store orders yet.
+            </div>
+          </section>
+
+          <!-- 5. MY ADDRESSES -->
+          <section id="addresses" class="ref-card mb-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+              <h2 class="ref-card-title fw-bold m-0">{{ t('profile.addresses') }}</h2>
+              <button type="button" class="btn-add-another-pet" @click="openAddAddressModal">
+                + Add Address
+              </button>
+            </div>
+
+            <div class="row g-3">
+              <div v-for="addr in addresses" :key="addr.id" class="col-12 col-md-6">
+                <div class="pet-inner-box h-100 border d-flex flex-column justify-content-between">
+                  <div>
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                      <span class="fw-bold heading-text">{{ addr.label }}</span>
+                      <span v-if="addr.isDefault" class="pet-badge-orange fw-semibold">Default</span>
+                    </div>
+                    <p class="small mb-1 fw-semibold">{{ addr.recipient }} · {{ addr.phone }}</p>
+                    <p class="small text-muted mb-2">{{ addr.street }}, {{ addr.city }} {{ addr.postalCode }}</p>
+                    <p v-if="addr.notes" class="text-muted mb-3" style="font-size: 0.75rem;">Note: {{ addr.notes }}</p>
+                  </div>
+                  <div class="d-flex align-items-center gap-2 pt-2 border-top">
+                    <button
+                      v-if="!addr.isDefault"
+                      type="button"
+                      class="btn-edit-badge border-0 fw-semibold"
+                      @click="makeDefaultAddress(addr.id)"
+                    >
+                      Set Default
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-danger rounded-3 ms-auto"
+                      @click="removeAddress(addr.id)"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
 
+          <!-- 6. BILLING INFORMATION -->
+          <section id="billing" class="ref-card mb-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+              <h2 class="ref-card-title fw-bold m-0">{{ t('profile.billing') }}</h2>
+              <button type="button" class="btn-add-another-pet" @click="showBillingModal = true">
+                + Add Payment Method
+              </button>
+            </div>
+
+            <div class="row g-3">
+              <div v-for="method in billingMethods" :key="method.id" class="col-12 col-md-6">
+                <div class="pet-inner-box h-100 border d-flex flex-column justify-content-between">
+                  <div>
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                      <span class="fw-bold heading-text">💳 {{ method.brand }} •••• {{ method.last4 }}</span>
+                      <span v-if="method.isDefault" class="pet-badge-orange fw-semibold">Default</span>
+                    </div>
+                    <p class="small text-muted mb-2">{{ method.holder }} · Exp {{ method.expiry }}</p>
+                  </div>
+                  <div class="d-flex align-items-center gap-2 pt-2 border-top">
+                    <button
+                      v-if="!method.isDefault"
+                      type="button"
+                      class="btn-edit-badge border-0 fw-semibold"
+                      @click="makeDefaultBilling(method.id)"
+                    >
+                      Set Default
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-danger rounded-3 ms-auto"
+                      @click="removeBilling(method.id)"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 7. SUPPORT -->
+          <section id="support" class="ref-card">
+            <h2 class="ref-card-title fw-bold mb-2">{{ t('profile.support') }}</h2>
+            <p class="text-muted small mb-4">
+              Need help with a salon appointment, haircare or skincare advice, or order delivery? Send a note to our beauty concierge.
+            </p>
+
+            <form @submit.prevent="submitSupportForm" class="mb-4">
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <BaseInput v-model="supportForm.subject" label="Subject" placeholder="e.g. Botanical serum recommendation" required />
+                </div>
+                <div class="col-md-6">
+                  <BaseSelect
+                    v-model="supportForm.topic"
+                    label="Topic"
+                    :options="[
+                      { label: 'Salon Appointment', value: 'Appointment' },
+                      { label: 'Store Order & Delivery', value: 'Order' },
+                      { label: 'Hair & Skin Care Advice', value: 'Skincare' },
+                      { label: 'Billing & Vouchers', value: 'Billing' }
+                    ]"
+                  />
+                </div>
+              </div>
+              <div class="mb-3">
+                <BaseInput
+                  type="textarea"
+                  :rows="3"
+                  v-model="supportForm.message"
+                  label="Message"
+                  placeholder="Tell us how we can elevate your beauty and salon experience..."
+                  required
+                />
+              </div>
+              <BaseButton type="submit" variant="primary">Send Support Request</BaseButton>
+            </form>
+
+            <div v-if="supportTickets.length" class="pt-3 border-top">
+              <h3 class="h6 fw-bold mb-2 heading-text">Recent Support Requests</h3>
+              <div class="d-flex flex-column gap-2">
+                <div v-for="tkt in supportTickets" :key="tkt.id" class="p-3 rounded-3 border d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="fw-semibold small heading-text">{{ tkt.subject }}</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">{{ tkt.topic }} · #{{ tkt.id }}</div>
+                  </div>
+                  <BaseBadge :status="tkt.status" size="sm" />
+                </div>
+              </div>
+            </div>
+          </section>
         </main>
       </div>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- EDIT ACCOUNT MODAL                                        -->
-    <!-- ========================================================= -->
-    <div v-if="isEditAccountModalOpen" class="modal-backdrop-custom position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center z-1060 p-3">
-      <div class="modal-card bg-white rounded-4 border shadow-lg p-4 max-w-500 w-100 animate-scale-up">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="fw-bold text-dark m-0">Edit Account Details</h5>
-          <button type="button" class="btn-close" @click="isEditAccountModalOpen = false"></button>
+    <!-- EDIT ACCOUNT MODAL -->
+    <BaseModal v-model="isEditAccountModalOpen" title="Edit Account Details" size="sm">
+      <form @submit.prevent="saveAccountDetails">
+        <div class="d-flex flex-column gap-3 mb-4">
+          <BaseInput v-model="editAccountForm.name" label="Full Name" required />
+          <BaseInput v-model="editAccountForm.email" label="Email Address" type="email" required />
+          <BaseInput v-model="editAccountForm.phone" label="Phone Number" type="tel" required />
+          <BaseInput v-model="editAccountForm.avatar" label="Avatar URL" placeholder="https://..." />
         </div>
-
-        <form @submit.prevent="saveAccountDetails">
-          <div class="d-flex flex-column gap-3 mb-4">
-            <div>
-              <label class="form-label small fw-semibold text-dark">Full Name</label>
-              <input type="text" v-model="editAccountForm.name" class="form-control rounded-3" required />
-            </div>
-            <div>
-              <label class="form-label small fw-semibold text-dark">Email Address</label>
-              <input type="email" v-model="editAccountForm.email" class="form-control rounded-3" required />
-            </div>
-            <div>
-              <label class="form-label small fw-semibold text-dark">Phone Number</label>
-              <input type="tel" v-model="editAccountForm.phone" class="form-control rounded-3" required />
-            </div>
-          </div>
-
-          <div class="d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-light rounded-pill px-3 py-1.5 fw-semibold small" @click="isEditAccountModalOpen = false">
-              Cancel
-            </button>
-            <button type="submit" class="btn-voucher-orange border-0 rounded-pill px-4 py-1.5 fw-semibold small">
-              Save Changes
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- ========================================================= -->
-    <!-- EDIT / ADD PET MODAL                                      -->
-    <!-- ========================================================= -->
-    <div v-if="isPetModalOpen" class="modal-backdrop-custom position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center z-1060 p-3">
-      <div class="modal-card bg-white rounded-4 border shadow-lg p-4 max-w-500 w-100 animate-scale-up">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="fw-bold text-dark m-0">{{ editingPetId ? 'Edit Pet' : 'Add New Pet' }}</h5>
-          <button type="button" class="btn-close" @click="isPetModalOpen = false"></button>
+        <div class="d-flex justify-content-end gap-2">
+          <BaseButton type="button" variant="outline-secondary" @click="isEditAccountModalOpen = false">Cancel</BaseButton>
+          <BaseButton type="submit" variant="primary">Save Changes</BaseButton>
         </div>
+      </form>
+    </BaseModal>
 
-        <form @submit.prevent="savePetDetails">
-          <div class="row g-3 mb-4">
-            <div class="col-12 col-sm-6">
-              <label class="form-label small fw-semibold text-dark">Pet Name</label>
-              <input type="text" v-model="petForm.name" class="form-control rounded-3" required placeholder="e.g. Bella" />
+    <!-- EDIT / ADD BEAUTY PROFILE MODAL -->
+    <BaseModal v-model="isPetModalOpen" :title="editingPetId ? 'Edit Beauty Profile' : 'Add Beauty Profile'" size="md">
+      <form @submit.prevent="savePetDetails">
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-sm-6">
+            <BaseInput v-model="petForm.name" label="Profile Name" required placeholder="e.g. Everyday Glow & Waves" />
+          </div>
+          <div class="col-12 col-sm-6">
+            <BaseInput v-model="petForm.breed" label="Hair Texture" required placeholder="e.g. Wavy • Medium" />
+          </div>
+          <div class="col-6">
+            <BaseSelect
+              v-model="petForm.type"
+              label="Focus Area"
+              :options="[
+                { label: 'Hair & Skin', value: 'Hair & Skin' },
+                { label: 'Color & Styling', value: 'Color & Styling' },
+                { label: 'Nails & Facial', value: 'Nails & Facial' }
+              ]"
+            />
+          </div>
+          <div class="col-6">
+            <BaseSelect
+              v-model="petForm.gender"
+              label="Undertone"
+              :options="[
+                { label: 'Warm Neutral', value: 'Warm Neutral' },
+                { label: 'Cool Rosy', value: 'Cool Rosy' },
+                { label: 'Golden Olive', value: 'Golden Olive' }
+              ]"
+            />
+          </div>
+          <div class="col-6">
+            <BaseInput v-model="petForm.age" label="Skin Type" placeholder="e.g. Combination Skin" />
+          </div>
+          <div class="col-6">
+            <BaseInput v-model="petForm.weight" label="Hair Length" placeholder="e.g. Long Length" />
+          </div>
+          <div class="col-6">
+            <BaseSelect
+              v-model="petForm.size"
+              label="Care Focus"
+              :options="[
+                { label: 'Hydration Focus', value: 'Hydration Focus' },
+                { label: 'Volume & Shine', value: 'Volume & Shine' },
+                { label: 'Keratin Repair', value: 'Keratin Repair' },
+                { label: 'Glass-Skin Glow', value: 'Glass-Skin Glow' }
+              ]"
+            />
+          </div>
+          <div class="col-6">
+            <BaseInput v-model="petForm.diet" label="Formula Preference" placeholder="e.g. Sulfate-Free Botanical" />
+          </div>
+          <div class="col-12">
+            <BaseInput v-model="petForm.specialNeeds" label="Sensitivities & Notes" placeholder="e.g. Heat protection & gentle fragrance" />
+          </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2">
+          <BaseButton type="button" variant="outline-secondary" @click="isPetModalOpen = false">Cancel</BaseButton>
+          <BaseButton type="submit" variant="primary">{{ editingPetId ? 'Update Profile' : 'Save Profile' }}</BaseButton>
+        </div>
+      </form>
+    </BaseModal>
+
+    <!-- CLAIM VOUCHER MODAL -->
+    <BaseModal v-model="showVoucherModal" title="Claim Voucher Code" size="sm">
+      <form @submit.prevent="submitVoucherCode">
+        <BaseInput
+          v-model="voucherInput"
+          label="Voucher Code"
+          placeholder="Try TIKIWELCOME or GLOW20"
+          required
+          class="mb-3"
+        />
+        <div class="d-flex justify-content-end gap-2">
+          <BaseButton type="button" variant="outline-secondary" @click="showVoucherModal = false">Cancel</BaseButton>
+          <BaseButton type="submit" variant="primary">Claim</BaseButton>
+        </div>
+      </form>
+    </BaseModal>
+
+    <!-- ADD ADDRESS MODAL -->
+    <BaseModal v-model="showAddressModal" title="Add Delivery Address" size="sm">
+      <form @submit.prevent="saveNewAddress">
+        <div class="d-flex flex-column gap-3 mb-4">
+          <BaseInput v-model="addressForm.label" label="Address Label" placeholder="e.g. Home, Office" required />
+          <BaseInput v-model="addressForm.recipient" label="Recipient Name" required />
+          <BaseInput v-model="addressForm.phone" label="Phone" type="tel" required />
+          <BaseInput v-model="addressForm.street" label="Street / Building" required />
+          <div class="row g-2">
+            <div class="col-7">
+              <BaseInput v-model="addressForm.city" label="City" required />
             </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label small fw-semibold text-dark">Breed</label>
-              <input type="text" v-model="petForm.breed" class="form-control rounded-3" required placeholder="e.g. Golden Retriever" />
-            </div>
-            <div class="col-6">
-              <label class="form-label small fw-semibold text-dark">Type</label>
-              <select v-model="petForm.type" class="form-select rounded-3">
-                <option value="Dog">Dog</option>
-                <option value="Cat">Cat</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-            <div class="col-6">
-              <label class="form-label small fw-semibold text-dark">Gender</label>
-              <select v-model="petForm.gender" class="form-select rounded-3">
-                <option value="Female">Female</option>
-                <option value="Male">Male</option>
-              </select>
-            </div>
-            <div class="col-6">
-              <label class="form-label small fw-semibold text-dark">Age</label>
-              <input type="text" v-model="petForm.age" class="form-control rounded-3" placeholder="e.g. 3 years" />
-            </div>
-            <div class="col-6">
-              <label class="form-label small fw-semibold text-dark">Weight</label>
-              <input type="text" v-model="petForm.weight" class="form-control rounded-3" placeholder="e.g. 30kg" />
-            </div>
-            <div class="col-6">
-              <label class="form-label small fw-semibold text-dark">Size</label>
-              <select v-model="petForm.size" class="form-select rounded-3">
-                <option value="Small">Small</option>
-                <option value="Medium">Medium</option>
-                <option value="Large">Large</option>
-                <option value="Extra Large">Extra Large</option>
-              </select>
-            </div>
-            <div class="col-6">
-              <label class="form-label small fw-semibold text-dark">Diet</label>
-              <input type="text" v-model="petForm.diet" class="form-control rounded-3" placeholder="e.g. Grain-free" />
-            </div>
-            <div class="col-12">
-              <label class="form-label small fw-semibold text-dark">Special needs</label>
-              <input type="text" v-model="petForm.specialNeeds" class="form-control rounded-3" placeholder="e.g. Sensitive stomach" />
+            <div class="col-5">
+              <BaseInput v-model="addressForm.postalCode" label="Postal Code" />
             </div>
           </div>
+          <BaseInput v-model="addressForm.notes" label="Delivery Note" placeholder="Gate code or landmarks" />
+        </div>
+        <div class="d-flex justify-content-end gap-2">
+          <BaseButton type="button" variant="outline-secondary" @click="showAddressModal = false">Cancel</BaseButton>
+          <BaseButton type="submit" variant="primary">Save Address</BaseButton>
+        </div>
+      </form>
+    </BaseModal>
 
-          <div class="d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-light rounded-pill px-3 py-1.5 fw-semibold small" @click="isPetModalOpen = false">
-              Cancel
-            </button>
-            <button type="submit" class="btn-voucher-orange border-0 rounded-pill px-4 py-1.5 fw-semibold small">
-              {{ editingPetId ? 'Update Pet' : 'Save Pet' }}
-            </button>
+    <!-- ADD PAYMENT MODAL -->
+    <BaseModal v-model="showBillingModal" title="Add Payment Method" size="sm">
+      <form @submit.prevent="saveNewBilling">
+        <div class="d-flex flex-column gap-3 mb-4">
+          <BaseSelect
+            v-model="billingForm.brand"
+            label="Payment Provider"
+            :options="[
+              { label: 'Visa', value: 'Visa' },
+              { label: 'Mastercard', value: 'Mastercard' },
+              { label: 'ABA PayWay', value: 'ABA PayWay' }
+            ]"
+          />
+          <BaseInput v-model="billingForm.holder" label="Cardholder / Account Name" required />
+          <div class="row g-2">
+            <div class="col-7">
+              <BaseInput v-model="billingForm.last4" label="Last 4 Digits" maxlength="4" placeholder="4242" required />
+            </div>
+            <div class="col-5">
+              <BaseInput v-model="billingForm.expiry" label="Expiry" placeholder="MM/YY" required />
+            </div>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2">
+          <BaseButton type="button" variant="outline-secondary" @click="showBillingModal = false">Cancel</BaseButton>
+          <BaseButton type="submit" variant="primary">Save Method</BaseButton>
+        </div>
+      </form>
+    </BaseModal>
 
+    <!-- LOGOUT MODAL -->
+    <BaseModal v-model="showLogoutModal" title="Confirm Logout" size="sm">
+      <p class="mb-0 text-muted small">Are you sure you want to log out of your account?</p>
+      <template #footer>
+        <BaseButton variant="outline-secondary" class="flex-grow-1" @click="showLogoutModal = false">Cancel</BaseButton>
+        <BaseButton variant="danger" class="flex-grow-1" @click="confirmLogout">Log out</BaseButton>
+      </template>
+    </BaseModal>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { Trash2 } from '@lucide/vue'
+import { useProfile } from '../../../composables/useProfile'
+import { useAdmin } from '../../../composables/useAdmin'
+import { useCart } from '../../../composables/useCart'
+import { useI18n } from '../../../composables/useI18n'
+import { useToastStore } from '../../../stores/toast'
 
+const route = useRoute()
 const router = useRouter()
+const toastStore = useToastStore()
+const { t } = useI18n()
+const { orders } = useAdmin()
+const { applyPromo } = useCart()
+
+const {
+  account,
+  pets,
+  addresses,
+  billingMethods,
+  vouchers,
+  supportTickets,
+  updateAccount,
+  addPet,
+  updatePet,
+  deletePet,
+  addAddress,
+  deleteAddress,
+  setDefaultAddress,
+  addBillingMethod,
+  deleteBillingMethod,
+  setDefaultBillingMethod,
+  claimVoucher,
+  addSupportTicket
+} = useProfile()
 
 const activeSection = ref('account')
 const showPetBanner = ref(true)
 
-// Account Data
-const account = ref({
-  name: 'Alisa Gitten',
-  email: 'alisa.gitten2910@gmail.com',
-  phone: '+4 079 355 05 86',
-  avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
-})
-
-// Pets Data
-const pets = ref([
-  {
-    id: 1,
-    name: 'Bella',
-    breed: 'Golden Retriever',
-    type: 'Dog',
-    age: '3 years',
-    gender: 'Female',
-    weight: '30kg',
-    size: 'Large',
-    diet: 'Grain-free',
-    specialNeeds: 'Sensitive stomach',
-    photo: 'https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
-  }
+const sidebarItems = computed(() => [
+  { id: 'account', label: t('profile.account'), emoji: '👤' },
+  { id: 'pets', label: t('profile.pets'), emoji: '🌸' },
+  { id: 'vouchers', label: t('profile.vouchers'), emoji: '🎟️' },
+  { id: 'orders', label: t('profile.orders'), emoji: '🧾' },
+  { id: 'addresses', label: t('profile.addresses'), emoji: '📍' },
+  { id: 'billing', label: t('profile.billing'), emoji: '💳' },
+  { id: 'support', label: t('profile.support'), emoji: '💬' }
 ])
 
-// Modals State
-const isEditAccountModalOpen = ref(false)
-const editAccountForm = ref({ ...account.value })
-
-const isPetModalOpen = ref(false)
-const editingPetId = ref(null)
-const petForm = ref({
-  name: '',
-  breed: '',
-  type: 'Dog',
-  age: '',
-  gender: 'Female',
-  weight: '',
-  size: 'Medium',
-  diet: '',
-  specialNeeds: '',
-  photo: 'https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
-})
+const customerOrders = computed(() => orders.value)
 
 const scrollToSection = (sectionId) => {
   activeSection.value = sectionId
@@ -487,34 +617,57 @@ const scrollToSection = (sectionId) => {
   }
 }
 
+const formatDate = (iso) => {
+  if (!iso) return ''
+  try {
+    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  } catch {
+    return iso
+  }
+}
+
+// Account Modal
+const isEditAccountModalOpen = ref(false)
+const editAccountForm = ref({ ...account.value })
 const openEditAccountModal = () => {
   editAccountForm.value = { ...account.value }
   isEditAccountModalOpen.value = true
 }
-
 const saveAccountDetails = () => {
-  account.value = { ...editAccountForm.value }
-  try {
-    localStorage.setItem('tiki_profile_account', JSON.stringify(account.value))
-  } catch (e) {
-    console.error(e)
-  }
+  updateAccount(editAccountForm.value)
   isEditAccountModalOpen.value = false
+  toastStore.showToast('Profile updated!', 'success')
 }
+
+// Beauty Profile Modal
+const isPetModalOpen = ref(false)
+const editingPetId = ref(null)
+const petForm = ref({
+  name: '',
+  breed: '',
+  type: 'Hair & Skin',
+  age: '',
+  gender: 'Warm Neutral',
+  weight: '',
+  size: 'Hydration Focus',
+  diet: '',
+  specialNeeds: '',
+  photo: '/images/hero_model.jpg'
+})
 
 const openAddPetModal = () => {
   editingPetId.value = null
   petForm.value = {
     name: '',
     breed: '',
-    type: 'Dog',
-    age: '1 year',
-    gender: 'Female',
-    weight: '12kg',
-    size: 'Medium',
-    diet: 'Natural organic',
+    type: 'Hair & Skin',
+    age: 'Combination Skin',
+    gender: 'Warm Neutral',
+    weight: 'Medium Length',
+    size: 'Hydration Focus',
+    diet: 'Sulfate-Free Botanical',
     specialNeeds: 'None',
-    photo: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+    photo: '/images/skincare.jpg'
   }
   isPetModalOpen.value = true
 }
@@ -527,371 +680,316 @@ const openEditPetModal = (pet) => {
 
 const savePetDetails = () => {
   if (editingPetId.value) {
-    const idx = pets.value.findIndex(p => p.id === editingPetId.value)
-    if (idx !== -1) {
-      pets.value[idx] = { ...petForm.value, id: editingPetId.value }
-    }
+    updatePet(editingPetId.value, petForm.value)
+    toastStore.showToast(`${petForm.value.name} updated.`, 'success')
   } else {
-    pets.value.push({
-      ...petForm.value,
-      id: Date.now()
-    })
-  }
-  try {
-    localStorage.setItem('tiki_profile_pets', JSON.stringify(pets.value))
-  } catch (e) {
-    console.error(e)
+    addPet(petForm.value)
+    toastStore.showToast(`Added ${petForm.value.name} to your beauty profiles!`, 'success')
   }
   isPetModalOpen.value = false
 }
 
-const openAddVoucherModal = () => {
-  alert('✨ Promo Code "TIKIWELCOME" applied! You received $15 off your next grooming session.')
+const confirmDeletePet = (pet) => {
+  deletePet(pet.id)
+  toastStore.showToast(`Removed ${pet.name}.`, 'info')
 }
 
-const handleLogout = () => {
-  if (confirm('Are you sure you want to log out?')) {
-    router.push('/')
+// Vouchers
+const showVoucherModal = ref(false)
+const voucherInput = ref('')
+const submitVoucherCode = () => {
+  const res = claimVoucher(voucherInput.value)
+  toastStore.showToast(res.message, res.success ? 'success' : 'danger')
+  if (res.success) {
+    voucherInput.value = ''
+    showVoucherModal.value = false
   }
+}
+
+const applyVoucherToCart = (code) => {
+  const res = applyPromo(code)
+  toastStore.showToast(res.message, 'success')
+  router.push('/cart')
+}
+
+// Addresses
+const showAddressModal = ref(false)
+const addressForm = reactive({
+  label: '',
+  recipient: account.value.name,
+  phone: account.value.phone,
+  street: '',
+  city: 'Phnom Penh',
+  postalCode: '120101',
+  notes: ''
+})
+const openAddAddressModal = () => {
+  addressForm.label = ''
+  addressForm.street = ''
+  addressForm.notes = ''
+  showAddressModal.value = true
+}
+const saveNewAddress = () => {
+  addAddress({ ...addressForm })
+  showAddressModal.value = false
+  toastStore.showToast('New address added.', 'success')
+}
+const makeDefaultAddress = (id) => {
+  setDefaultAddress(id)
+  toastStore.showToast('Default delivery address updated.', 'success')
+}
+const removeAddress = (id) => {
+  deleteAddress(id)
+  toastStore.showToast('Address removed.', 'info')
+}
+
+// Billing
+const showBillingModal = ref(false)
+const billingForm = reactive({
+  brand: 'Visa',
+  holder: account.value.name.toUpperCase(),
+  last4: '',
+  expiry: '12/28'
+})
+const saveNewBilling = () => {
+  addBillingMethod({ ...billingForm })
+  billingForm.last4 = ''
+  showBillingModal.value = false
+  toastStore.showToast('Payment method saved.', 'success')
+}
+const makeDefaultBilling = (id) => {
+  setDefaultBillingMethod(id)
+  toastStore.showToast('Default payment method updated.', 'success')
+}
+const removeBilling = (id) => {
+  deleteBillingMethod(id)
+  toastStore.showToast('Payment method removed.', 'info')
+}
+
+// Support
+const supportForm = reactive({
+  subject: '',
+  topic: 'Appointment',
+  message: ''
+})
+const submitSupportForm = () => {
+  const ticket = addSupportTicket({ ...supportForm })
+  supportForm.subject = ''
+  supportForm.message = ''
+  toastStore.showToast(`Support ticket #${ticket.id} sent! We will reply shortly.`, 'success')
+}
+
+// Logout
+const showLogoutModal = ref(false)
+const confirmLogout = () => {
+  showLogoutModal.value = false
+  toastStore.showToast('Signed out.', 'info')
+  router.push('/login')
 }
 
 onMounted(() => {
   window.scrollTo(0, 0)
-  try {
-    const savedAcc = localStorage.getItem('tiki_profile_account')
-    if (savedAcc) {
-      account.value = JSON.parse(savedAcc)
-    }
-    const savedPets = localStorage.getItem('tiki_profile_pets')
-    if (savedPets) {
-      pets.value = JSON.parse(savedPets)
-    }
-  } catch (e) {
-    console.error(e)
+  if (route.hash) {
+    const id = route.hash.replace('#', '')
+    activeSection.value = id
+    setTimeout(() => scrollToSection(id), 150)
   }
 })
 </script>
 
 <style scoped>
-/* ========================================================= */
-/* PAGE WRAPPER & PROPORTIONS                                */
-/* ========================================================= */
 .profile-layout-container {
-  background-color: #FAF8F5;
+  background-color: color-mix(in srgb, var(--storefront-bg, #FAF8F5) 76%, transparent);
   min-height: 100vh;
-  padding-top: 72px;
+  padding-top: 76px;
   padding-bottom: 60px;
 }
 
-/* Background Decorative Blob at bottom right */
 .blob-bottom-right {
   position: fixed;
   bottom: 0;
   right: 0;
-  width: 440px;
-  height: 440px;
-  background-color: #EA7A38;
+  width: 380px;
+  height: 380px;
+  background-color: rgba(234, 122, 56, 0.12);
   border-radius: 100% 0 0 0;
   z-index: 0;
 }
 
-/* Page Header */
+.page-title,
+.heading-text,
+.ref-card-title,
+.account-name,
+.pet-title,
+.attr-value {
+  color: var(--text-heading-color, #1a1a1a);
+}
+
 .page-title {
-  font-size: 2.25rem;
+  font-size: 2.1rem;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #1a1a1a;
 }
 
-.breadcrumb-link {
-  font-size: 0.86rem;
-}
-
-/* Flex layout between Sidebar and Cards */
 .profile-columns-layout {
   gap: 24px;
 }
 
-/* ========================================================= */
-/* SIDEBAR STYLING EXACT MATCH                               */
-/* ========================================================= */
 .profile-sidebar-column {
-  width: 242px;
+  width: 245px;
   position: sticky;
   top: 76px;
 }
 
+.profile-nav-card,
+.ref-card {
+  background-color: var(--storefront-surface, #ffffff);
+  border: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0);
+  box-shadow: none !important;
+}
+
 .profile-nav-card {
-  border-radius: 28px;
-  padding: 16px 14px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-  border: 1px solid rgba(0, 0, 0, 0.03);
+  border-radius: 16px;
+  padding: 14px;
 }
 
 .profile-sidebar-item {
   width: 100%;
   background: transparent;
-  padding: 10px 16px;
-  border-radius: 18px;
-  color: #374151;
-  font-size: 0.94rem;
+  padding: 10px 14px;
+  border-radius: 14px;
+  color: var(--text-base, #374151);
+  font-size: 0.9rem;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
   transition: all 0.16s ease;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
-.profile-sidebar-item:hover:not(.active):not(.support-highlight-item):not(.logout-item) {
-  background-color: #f9fafb;
-  color: #111827;
+.profile-sidebar-item:hover:not(.active) {
+  background-color: var(--surface-ground, #f1f5f9);
 }
 
 .profile-sidebar-item.active {
-  background-color: #FBF2EB !important;
-  color: #DF7636 !important;
+  background-color: var(--primary-color-soft, #FBF2EB);
+  color: var(--primary-color, #EA7A38);
   font-weight: 700;
 }
 
 .support-highlight-item {
-  background-color: #FBF5EE;
-  color: #DF7636;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-.support-highlight-item:hover {
-  background-color: #FBF2EB;
-}
-
-.logout-item {
-  margin-bottom: 0;
-  color: #DC2626;
-  font-weight: 600;
-}
-
-.logout-item:hover {
-  background-color: #FEF2F2;
+  background-color: rgba(234, 122, 56, 0.06);
 }
 
 .sidebar-spacer {
-  height: 52px;
+  height: 24px;
 }
 
-.nav-icon {
-  font-size: 1.05rem;
-  width: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.item-text {
-  line-height: 1;
-}
-
-/* ========================================================= */
-/* MAIN CONTENT CARDS                                        */
-/* ========================================================= */
 .ref-card {
-  border-radius: 22px;
-  padding: 28px 32px;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.02);
-  border: 1px solid rgba(0, 0, 0, 0.03);
+  border-radius: 16px;
+  padding: 24px 26px;
 }
 
-.ref-card-title {
-  font-size: 1.15rem;
-  letter-spacing: -0.01em;
-}
-
-/* Account Details */
 .account-avatar {
-  width: 66px;
-  height: 66px;
+  width: 68px;
+  height: 68px;
 }
 
-.account-name {
-  font-size: 1.05rem;
-  line-height: 1.2;
-}
-
-.account-meta {
-  font-size: 0.85rem;
-  line-height: 1.3;
-}
-
-/* Edit Pill Button */
 .btn-edit-badge {
-  background-color: #FFF3E8;
-  color: #EA7A38;
+  background-color: var(--primary-color-soft, #FFF3E8);
+  color: var(--primary-color, #EA7A38);
   border-radius: 9px;
   padding: 5px 12px;
-  font-size: 0.82rem;
-  transition: all 0.16s ease;
+  font-size: 0.8rem;
 }
 
-.btn-edit-badge:hover {
-  background-color: #FFE6D0;
-  color: #D96928;
-}
-
-/* Green Banner */
 .ref-green-banner {
-  background-color: #EAF8F0;
+  background-color: rgba(16, 185, 129, 0.12);
   border-radius: 14px;
   padding: 12px 16px;
 }
 
 .green-banner-text {
-  color: #2E7D32;
+  color: var(--success-color, #0d9467);
   font-size: 0.85rem;
   font-weight: 500;
-  line-height: 1.4;
 }
 
 .btn-close-green-circle {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  background-color: #34D399;
+  background-color: #10b981;
   color: #ffffff;
-  font-size: 0.62rem;
-  line-height: 1;
-  cursor: pointer;
+  font-size: 0.65rem;
 }
 
-/* Pet Inner Box */
-.pet-inner-box {
-  background-color: #F8F9FA;
-  border-radius: 18px;
-  padding: 20px 22px;
+.pet-inner-box,
+.voucher-item-card {
+  background-color: var(--surface-ground, #F8F9FA);
+  border-radius: 16px;
+  padding: 18px 20px;
+  border-color: var(--border-clr) !important;
 }
 
 .pet-photo {
   width: 76px;
   height: 76px;
-  border-radius: 14px;
 }
 
-.pet-title {
-  font-size: 1.18rem;
-  line-height: 1;
-}
-
-/* Pet Badges */
 .pet-badge-orange {
-  background-color: #FFF3E8;
-  color: #EA7A38;
+  background-color: var(--primary-color-soft, #FFF3E8);
+  color: var(--primary-color, #EA7A38);
   border-radius: 9999px;
   padding: 3px 11px;
   font-size: 0.74rem;
 }
 
 .pet-badge-white {
-  background-color: #FFFFFF;
-  color: #4B5563;
-  border: 1px solid #E5E7EB;
+  background-color: var(--storefront-surface, #ffffff);
+  color: var(--text-base, #4B5563);
+  border: 1px solid var(--border-clr, #E5E7EB);
   border-radius: 9999px;
   padding: 3px 11px;
   font-size: 0.74rem;
   font-weight: 500;
 }
 
-/* 4 Attributes Pill Box */
-.attributes-grid {
-  display: flex;
-}
-
 .attribute-pill-box {
-  background-color: #FFF3E8;
+  background-color: var(--primary-color-soft, #FFF3E8);
   border-radius: 12px;
   padding: 8px 12px;
   flex: 1 1 auto;
-  min-width: 105px;
-}
-
-.attr-icon {
-  font-size: 1.05rem;
+  min-width: 110px;
 }
 
 .attr-label {
   font-size: 0.65rem;
-  color: #9C6B45;
+  color: var(--secondary-color, #9C6B45);
   font-weight: 500;
-  line-height: 1.2;
 }
 
 .attr-value {
   font-size: 0.82rem;
-  line-height: 1.2;
 }
 
-/* Add Another Pet Button */
 .btn-add-another-pet {
-  background-color: #FFFFFF;
-  border: 1px dashed #FFD4B2;
-  color: #EA7A38;
+  background-color: var(--storefront-surface, #FFFFFF);
+  border: 1px dashed rgba(234, 122, 56, 0.5);
+  color: var(--primary-color, #EA7A38);
   border-radius: 10px;
   padding: 7px 16px;
   font-size: 0.84rem;
   font-weight: 600;
-  transition: all 0.16s ease;
-}
-
-.btn-add-another-pet:hover {
-  background-color: #FFF8F3;
-  border-color: #EA7A38;
-}
-
-/* Vouchers Section */
-.voucher-poodle-img {
-  width: 130px;
-  height: 130px;
-  border-radius: 18px;
-}
-
-.voucher-heading {
-  font-size: 1.12rem;
-}
-
-.voucher-desc {
-  font-size: 0.84rem;
-  line-height: 1.5;
 }
 
 .btn-voucher-orange {
   background-color: #EA7A38;
   color: #ffffff;
   border-radius: 10px;
-  padding: 9px 22px;
-  font-size: 0.86rem;
-  transition: all 0.16s ease;
-}
-
-.btn-voucher-orange:hover {
-  background-color: #D96928;
-  transform: translateY(-1px);
-}
-
-/* Modal styles */
-.max-w-500 {
-  max-width: 500px;
-}
-
-.modal-backdrop-custom {
-  background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(4px);
-}
-
-.animate-scale-up {
-  animation: scaleUp 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes scaleUp {
-  from { transform: scale(0.96); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  padding: 8px 18px;
+  font-size: 0.85rem;
 }
 
 @media (max-width: 991px) {
@@ -900,7 +998,7 @@ onMounted(() => {
     position: static;
   }
   .sidebar-spacer {
-    height: 16px;
+    height: 10px;
   }
 }
 </style>

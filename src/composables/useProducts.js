@@ -1,74 +1,110 @@
 import { ref, watch } from 'vue'
 
-const STORAGE_KEY = 'tiki_salon_products'
+const STORAGE_KEY = 'tiki_beauty_products_v2'
 
 const initialProducts = [
   {
     id: 1,
-    name: 'Royal Canin Medium Adult Dry Food (12kg)',
-    description: 'Complete nutritional formula specifically tailored for medium-sized adult dogs with natural prebiotic fiber.',
-    price: '$54.99',
-    rawPrice: 54.99,
-    image: 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&q=80&w=600',
+    name: 'Aura Botanical Nourishing Shampoo (500ml)',
+    description: 'Sulfate-free rosemary, cedarwood, and horsetail botanical complex shampoo that gently cleanses and restores natural hair volume and shine.',
+    price: '$28.00',
+    rawPrice: 28.00,
+    image: '/images/shampoo.jpg',
     tag: 'Best Seller',
-    category: 'Food & Nutrition',
+    category: 'Hair Care',
     stock: 45,
     status: 'In Stock'
   },
   {
     id: 2,
-    name: 'Purina Pro Plan Adult Wet Food (12 x 400g)',
-    description: 'High-protein grain-free wet dog food with real tender lamb and savory gravy for optimal vitality.',
-    price: '$18.49',
-    rawPrice: 18.49,
-    image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=600',
-    category: 'Food & Nutrition',
-    stock: 82,
+    name: 'Aurélia Luxury Argan Hair Oil (100ml)',
+    description: '100% cold-pressed Moroccan argan elixir with silky fast absorption to nourish split ends, tame frizz, and leave hair mirror-glossy.',
+    price: '$36.00',
+    rawPrice: 36.00,
+    image: '/images/argan_oil.jpg',
+    tag: 'Top Rated',
+    category: 'Serums & Oils',
+    stock: 38,
     status: 'In Stock'
   },
   {
     id: 3,
-    name: 'Trixie Rubber Dumbbell Chew Toy (Medium)',
-    description: 'Durable non-toxic natural rubber toy for active chewing, dental massage, and fetching fun.',
-    price: '$7.99',
-    rawPrice: 7.99,
-    image: 'https://images.unsplash.com/photo-1535294435445-d7249524ef2e?auto=format&fit=crop&q=80&w=600',
-    category: 'Toys & Fun',
-    stock: 14,
-    status: 'Low Stock'
+    name: 'Avène Botanicals Shampoo & Radiance Serum Duo',
+    description: 'Complete salon haircare ritual pairing our revitalizing botanical wash with jojoba, rosehip & bergamot radiance hair serum.',
+    price: '$58.00',
+    rawPrice: 58.00,
+    image: '/images/haircare.jpg',
+    tag: 'Value Set',
+    category: 'Hair Care',
+    stock: 24,
+    status: 'In Stock'
   },
   {
     id: 4,
-    name: 'N&D Comfort Ergonomic Dog Harness (Size M)',
-    description: 'Padded breathable no-pull harness with reflective night stitching and quick-release safety buckles.',
-    price: '$24.90',
-    rawPrice: 24.90,
-    image: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&q=80&w=600',
-    category: 'Accessories',
-    stock: 28,
+    name: 'Botanical Radiancy Serum & Glow Moisturizer Set',
+    description: 'Illuminating 30ml floral oil serum paired with our whipped luminosity cream moisturizer for dewy, glass-skin hydration.',
+    price: '$64.00',
+    rawPrice: 64.00,
+    image: '/images/skincare.jpg',
+    tag: 'Glow Pick',
+    category: 'Skin & Glow',
+    stock: 19,
     status: 'In Stock'
   },
   {
     id: 5,
-    name: 'Tiki Organic Oatmeal & Aloe Pet Shampoo (500ml)',
-    description: 'Hypoallergenic soothing formula to relieve dry itchy skin and leave coat silky soft.',
-    price: '$16.50',
-    rawPrice: 16.50,
-    image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=600',
-    tag: 'Top Rated',
-    category: 'Grooming & Care',
-    stock: 5,
+    name: 'Act+Acre Restorative Keratin Hair Mask (133ml)',
+    description: 'Deep-conditioning plant-keratin intensive hair treatment formulated to repair color-treated, heat-styled, and dry strands.',
+    price: '$38.00',
+    rawPrice: 38.00,
+    image: '/images/prod_hair_mask.jpg',
+    category: 'Hair Care',
+    stock: 12,
     status: 'Low Stock'
   },
   {
     id: 6,
-    name: 'Natural Shea Butter Paw & Nose Balm (60g)',
-    description: '100% organic lick-safe restorative wax for cracked paws, rough noses, and seasonal protection.',
-    price: '$12.00',
-    rawPrice: 12.00,
-    image: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&q=80&w=600',
-    category: 'Grooming & Care',
-    stock: 64,
+    name: 'Silk Velvet Matte Lip & Gloss Duo',
+    description: 'Weightless conditioning velvet lipstick and high-shine botanical lip lacquer in signature rose-crimson for day-to-evening elegance.',
+    price: '$29.50',
+    rawPrice: 29.50,
+    image: '/images/prod_lip_duo.jpg',
+    tag: 'New',
+    category: 'Makeup & Tools',
+    stock: 32,
+    status: 'In Stock'
+  },
+  {
+    id: 7,
+    name: 'Rosewater Hydrating Cleanser & Cream Duo',
+    description: 'Gentle pH-balanced foaming cleanser and oil-free soothing daily gel moisturizer infused with pure rosewater and hyaluronic acid.',
+    price: '$42.00',
+    rawPrice: 42.00,
+    image: '/images/prod_cleanser_duo.jpg',
+    category: 'Skin & Glow',
+    stock: 27,
+    status: 'In Stock'
+  },
+  {
+    id: 8,
+    name: 'Pro Salon Ceramic Styler & Paddle Brush Kit',
+    description: 'Professional tourmaline-ceramic flat iron, high-velocity salon blow dryer, detangling paddle brush, and precision styling clips.',
+    price: '$72.00',
+    rawPrice: 72.00,
+    image: '/images/prod_styling_tools.jpg',
+    category: 'Makeup & Tools',
+    stock: 8,
+    status: 'Low Stock'
+  },
+  {
+    id: 9,
+    name: 'Nécessaire Botanical Body & Neck Emulsion (200ml)',
+    description: 'Fragrance-free multi-peptide, niacinamide, and vitamin E fast-absorbing silk lotion for soft, luminous skin.',
+    price: '$34.00',
+    rawPrice: 34.00,
+    image: '/images/prod_body_lotion.jpg',
+    category: 'Skin & Glow',
+    stock: 50,
     status: 'In Stock'
   }
 ]
@@ -105,7 +141,7 @@ watch(products, () => {
 loadProducts()
 
 export function useProducts() {
-  const categories = ['All', 'Food & Nutrition', 'Grooming & Care', 'Accessories', 'Toys & Fun']
+  const categories = ['All', 'Hair Care', 'Skin & Glow', 'Serums & Oils', 'Makeup & Tools']
 
   const addProduct = (productData) => {
     const newId = products.value.length > 0 ? Math.max(...products.value.map(p => Number(p.id) || 0)) + 1 : 1
@@ -118,9 +154,9 @@ export function useProducts() {
       description: productData.description || '',
       price: `$${rawVal.toFixed(2)}`,
       rawPrice: rawVal,
-      image: productData.image || 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=600',
+      image: productData.image || '/images/shampoo.jpg',
       tag: productData.tag || '',
-      category: productData.category || 'Grooming & Care',
+      category: productData.category || 'Hair Care',
       stock: stockVal,
       status: stockVal <= 0 ? 'Out of Stock' : (stockVal < 10 ? 'Low Stock' : 'In Stock')
     }
