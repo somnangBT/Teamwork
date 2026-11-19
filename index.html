@@ -4,7 +4,24 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>salon</title>
+    <script>
+      (function () {
+        try {
+          var appearance = JSON.parse(localStorage.getItem('app-Appearance') || '{}');
+          var theme = localStorage.getItem('salon_theme') || appearance.theme || localStorage.getItem('app-theme') || 'light';
+          if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.documentElement.classList.add('dark-theme');
+          } else {
+            document.documentElement.removeAttribute('data-theme');
+            document.documentElement.classList.remove('dark-theme');
+          }
+          var lang = localStorage.getItem('salon_lang');
+          if (lang === 'kh') document.documentElement.lang = 'km';
+        } catch (e) {}
+      })();
+    </script>
+    <title>Tiki Tiki — Women’s Beauty Salon &amp; Care Store</title>
   </head>
   <body>
     <div id="app"></div>

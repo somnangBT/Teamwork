@@ -3,9 +3,9 @@ import { useBooking } from './useBooking'
 import { useProducts } from './useProducts'
 import { useServices } from './useServices'
 
-const ORDERS_KEY = 'tiki_salon_admin_orders'
-const CUSTOMERS_KEY = 'tiki_salon_admin_customers'
-const STAFF_KEY = 'tiki_salon_admin_staff'
+const ORDERS_KEY = 'tiki_beauty_admin_orders_v2'
+const CUSTOMERS_KEY = 'tiki_beauty_admin_customers_v2'
+const STAFF_KEY = 'tiki_beauty_admin_staff_v2'
 
 const initialOrders = [
   {
@@ -14,15 +14,15 @@ const initialOrders = [
     customerName: 'Alisa Gitten',
     customerEmail: 'alisa.gitten2910@gmail.com',
     customerPhone: '+4 079 355 05 86',
-    petName: 'Bella (Golden Retriever)',
+    petName: 'Wavy Hair • Glass-Skin Routine',
     items: [
-      { name: 'Royal Canin Medium Adult Dry Food (12kg)', quantity: 1, price: 54.99 },
-      { name: 'Natural Shea Butter Paw & Nose Balm (60g)', quantity: 2, price: 12.00 }
+      { name: 'Aura Botanical Nourishing Shampoo (500ml)', quantity: 1, price: 28.00 },
+      { name: 'Aurélia Luxury Argan Hair Oil (100ml)', quantity: 1, price: 36.00 }
     ],
-    subtotal: 78.99,
+    subtotal: 64.00,
     discount: 10.00,
     shippingFee: 0.00,
-    total: 68.99,
+    total: 54.00,
     status: 'Delivered',
     paymentStatus: 'Paid',
     paymentMethod: 'Apple Pay',
@@ -32,18 +32,18 @@ const initialOrders = [
   {
     id: 'ORD-89211',
     orderNumber: '#TK-89211',
-    customerName: 'Marcus Sterling',
-    customerEmail: 'm.sterling@outlook.com',
-    customerPhone: '+4 079 482 11 02',
-    petName: 'Milo (British Shorthair)',
+    customerName: 'Clara Oswald',
+    customerEmail: 'clara.oswald@gmail.com',
+    customerPhone: '+4 078 911 34 22',
+    petName: 'Botanical Radiance Set',
     items: [
-      { name: 'Purina Pro Plan Adult Wet Food (12 x 400g)', quantity: 2, price: 18.49 },
-      { name: 'Trixie Rubber Dumbbell Chew Toy (Medium)', quantity: 1, price: 7.99 }
+      { name: 'Botanical Radiancy Serum & Glow Moisturizer Set', quantity: 1, price: 64.00 },
+      { name: 'Silk Velvet Matte Lip & Gloss Duo', quantity: 1, price: 29.50 }
     ],
-    subtotal: 44.97,
+    subtotal: 93.50,
     discount: 0.00,
     shippingFee: 2.99,
-    total: 47.96,
+    total: 96.49,
     status: 'Shipped',
     paymentStatus: 'Paid',
     paymentMethod: 'Credit Card (Visa)',
@@ -53,18 +53,18 @@ const initialOrders = [
   {
     id: 'ORD-89212',
     orderNumber: '#TK-89212',
-    customerName: 'David Chen',
-    customerEmail: 'david.chen@yahoo.com',
+    customerName: 'Mina Kim',
+    customerEmail: 'mina.kim@yahoo.com',
     customerPhone: '+4 077 123 44 88',
-    petName: 'Koko (Pomeranian)',
+    petName: 'Keratin Care Bundle',
     items: [
-      { name: 'N&D Comfort Ergonomic Dog Harness (Size M)', quantity: 1, price: 24.90 },
-      { name: 'Tiki Organic Oatmeal & Aloe Pet Shampoo (500ml)', quantity: 1, price: 16.50 }
+      { name: 'Act+Acre Restorative Keratin Hair Mask (133ml)', quantity: 1, price: 38.00 },
+      { name: 'Rosewater Hydrating Cleanser & Cream Duo', quantity: 1, price: 42.00 }
     ],
-    subtotal: 41.40,
+    subtotal: 80.00,
     discount: 0.00,
     shippingFee: 2.99,
-    total: 44.39,
+    total: 82.99,
     status: 'Processing',
     paymentStatus: 'Paid',
     paymentMethod: 'ABA PayWay',
@@ -74,17 +74,18 @@ const initialOrders = [
   {
     id: 'ORD-89213',
     orderNumber: '#TK-89213',
-    customerName: 'Elena Rostova',
-    customerEmail: 'elena.rostova@sample.com',
+    customerName: 'Nadia Sokha',
+    customerEmail: 'nadia.sokha@gmail.com',
     customerPhone: '+4 078 992 41 15',
-    petName: 'Rex (German Shepherd)',
+    petName: 'Salon Styling Pro Kit',
     items: [
-      { name: 'Royal Canin Medium Adult Dry Food (12kg)', quantity: 2, price: 54.99 }
+      { name: 'Pro Salon Ceramic Styler & Paddle Brush Kit', quantity: 1, price: 72.00 },
+      { name: 'Nécessaire Botanical Body & Neck Emulsion (200ml)', quantity: 1, price: 34.00 }
     ],
-    subtotal: 109.98,
+    subtotal: 106.00,
     discount: 15.00,
     shippingFee: 0.00,
-    total: 94.98,
+    total: 91.00,
     status: 'Pending',
     paymentStatus: 'Pending',
     paymentMethod: 'Cash on Delivery',
@@ -100,31 +101,31 @@ const initialCustomers = [
     email: 'alisa.gitten2910@gmail.com',
     phone: '+4 079 355 05 86',
     avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
-    petName: 'Bella',
-    petType: 'Dog',
-    petBreed: 'Golden Retriever',
-    petAge: '3 years',
+    petName: 'Everyday Glow & Waves',
+    petType: 'Hair & Skin',
+    petBreed: 'Wavy Medium Hair',
+    petAge: 'Combination Skin',
     loyaltyTier: 'VIP Gold',
     totalSpent: 485.50,
     totalVisits: 8,
     lastVisit: '2 days ago',
-    specialNotes: 'Sensitive skin, loves organic lavender mist after grooming.'
+    specialNotes: 'Prefers sulfate-free rosemary wash and warm caramel blowout.'
   },
   {
     id: 'CUST-002',
-    name: 'Marcus Sterling',
-    email: 'm.sterling@outlook.com',
+    name: 'Nadia Sokha',
+    email: 'nadia.sokha@gmail.com',
     phone: '+4 079 482 11 02',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
-    petName: 'Milo',
-    petType: 'Cat',
-    petBreed: 'British Shorthair',
-    petAge: '2 years',
+    avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
+    petName: 'Glass-Skin & Silk Hair',
+    petType: 'Facial & Spa',
+    petBreed: 'Fine Straight Hair',
+    petAge: 'Dry / Sensitive',
     loyaltyTier: 'Silver Member',
     totalSpent: 210.00,
     totalVisits: 4,
     lastVisit: 'Yesterday',
-    specialNotes: 'Gentle deshedding, prefers low-noise blow dryer.'
+    specialNotes: 'Loves rosehip facial mist and gentle eucalyptus head spa.'
   },
   {
     id: 'CUST-003',
@@ -132,31 +133,31 @@ const initialCustomers = [
     email: 'clara.oswald@gmail.com',
     phone: '+4 078 911 34 22',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
-    petName: 'Daisy',
-    petType: 'Dog',
-    petBreed: 'Poodle',
-    petAge: '4 years',
+    petName: 'Radiant Balayage Care',
+    petType: 'Color & Glow',
+    petBreed: 'Curly Thick Hair',
+    petAge: 'Normal Skin',
     loyaltyTier: 'VIP Platinum',
     totalSpent: 720.00,
     totalVisits: 12,
     lastVisit: '3 days ago',
-    specialNotes: 'Always requests Blueberry facial and scissor styling finish.'
+    specialNotes: 'Always requests keratin bond mask and blush gel manicure.'
   },
   {
     id: 'CUST-004',
-    name: 'David Chen',
-    email: 'david.chen@yahoo.com',
+    name: 'Mina Kim',
+    email: 'mina.kim@yahoo.com',
     phone: '+4 077 123 44 88',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
-    petName: 'Koko',
-    petType: 'Dog',
-    petBreed: 'Pomeranian Puppy',
-    petAge: '5 months',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
+    petName: 'Sheer Blush Nail & Lash',
+    petType: 'Nails & Beauty',
+    petBreed: 'Long Layered Hair',
+    petAge: 'Combination',
     loyaltyTier: 'New Member',
-    totalSpent: 69.29,
-    totalVisits: 1,
+    totalSpent: 98.50,
+    totalVisits: 2,
     lastVisit: 'Today',
-    specialNotes: 'Puppy intro session. Needs gentle positive reinforcement treats.'
+    specialNotes: 'Prefers sheer pink gel polish and lightweight argan oil serum.'
   }
 ]
 
@@ -164,53 +165,53 @@ const initialStaff = [
   {
     id: 'STF-01',
     name: 'Elena Rostova',
-    role: 'Master Dog Groomer & Breed Stylist',
+    role: 'Creative Hair & Blowout Director',
     email: 'elena@tikisalon.com',
     phone: '+4 079 100 20 01',
     rating: 4.98,
     reviewsCount: 142,
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
     status: 'On Duty',
-    specialties: ['Breed Styling', 'Show Cuts', 'Full Deshedding'],
+    specialties: ['Precision Cuts', 'Silk Blowouts', 'Bridal Updos'],
     activeAppointments: 3
   },
   {
     id: 'STF-02',
     name: 'Marcus Vance',
-    role: 'Cat Grooming & Sensitive Care Specialist',
+    role: 'Balayage & Color Specialist',
     email: 'marcus@tikisalon.com',
     phone: '+4 079 100 20 02',
     rating: 4.95,
     reviewsCount: 98,
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
     status: 'On Duty',
-    specialties: ['Cat Styling', 'De-Matting', 'Gentle Handling'],
+    specialties: ['Balayage', 'Gloss Toning', 'Keratin Repair'],
     activeAppointments: 2
   },
   {
     id: 'STF-03',
     name: 'Sophia Laurent',
-    role: 'Pet Hydro-Spa & Aromatherapist',
+    role: 'Botanical Head Spa & Facialist',
     email: 'sophia@tikisalon.com',
     phone: '+4 079 100 20 03',
     rating: 4.92,
     reviewsCount: 76,
     avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
     status: 'Break',
-    specialties: ['Hydrotherapy', 'Aroma Spa', 'Skin Recovery'],
+    specialties: ['Herbal Head Spa', 'Radiance Facials', 'Aromatherapy'],
     activeAppointments: 1
   },
   {
     id: 'STF-04',
     name: 'Chloe Lin',
-    role: 'Puppy Care & Gentle Groomer',
+    role: 'Nail Artistry & Lash Stylist',
     email: 'chloe@tikisalon.com',
     phone: '+4 079 100 20 04',
     rating: 4.90,
     reviewsCount: 64,
     avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
     status: 'On Duty',
-    specialties: ['Puppy First Visits', 'Nail Smooth Grind', 'Gentle Wash'],
+    specialties: ['Gel Manicure', 'Nail Art', 'Cuticle Therapy'],
     activeAppointments: 2
   }
 ]
@@ -373,6 +374,25 @@ export function useAdmin() {
     return newStaff
   }
 
+  const updateStaffMember = (id, fields) => {
+    const idx = staffList.value.findIndex(s => s.id === id)
+    if (idx !== -1) {
+      staffList.value[idx] = {
+        ...staffList.value[idx],
+        ...fields
+      }
+      saveAdminData()
+    }
+  }
+
+  const deleteStaffMember = (id) => {
+    const idx = staffList.value.findIndex(s => s.id === id)
+    if (idx !== -1) {
+      staffList.value.splice(idx, 1)
+      saveAdminData()
+    }
+  }
+
   return {
     orders,
     customers,
@@ -388,6 +408,8 @@ export function useAdmin() {
     updateCustomer,
     deleteCustomer,
     updateStaffStatus,
-    addStaffMember
+    addStaffMember,
+    updateStaffMember,
+    deleteStaffMember
   }
 }

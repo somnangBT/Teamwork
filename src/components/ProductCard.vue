@@ -1,177 +1,200 @@
 <template>
-  <div class="awwwards-card d-flex flex-column h-100">
-    <!-- Thumbnail Area -->
+  <article
+    class="salon-product-card d-flex flex-column h-100"
+    @click="$emit('view', product)"
+  >
+    <!-- Top Image Area -->
     <div class="card-thumb-wrap position-relative overflow-hidden mb-3">
-      <img :src="product.image" :alt="product.name" class="w-100 h-100 card-thumb-img" />
-      
-      <!-- Top Badges Overlay -->
-      <div class="thumb-top-badges position-absolute top-0 start-0 w-100 p-2 d-flex justify-content-between align-items-center pointer-events-none">
-        <span class="badge-tag badge-tag-orange fw-bold" v-if="product.badge || product.rating >= 4.8">
-          SOTD
+      <img :src="product.image" :alt="product.name" class="w-100 h-100 card-thumb-img" loading="lazy" />
+
+      <!-- Top-Right Favorite Circle Button (Reference Style) -->
+      <button
+        type="button"
+        class="btn-card-fav position-absolute top-0 end-0 m-2 d-flex align-items-center justify-content-center"
+        @click.stop="$emit('favorite', product)"
+        :class="{ 'is-fav': isFav }"
+        :aria-pressed="isFav ? 'true' : 'false'"
+        :aria-label="isFav ? 'Remove from favorites' : 'Save to favorites'"
+      >
+        <Heart :size="15" :fill="isFav ? 'currentColor' : 'none'" />
+      </button>
+    </div>
+
+    <!-- Card Body -->
+    <div class="d-flex flex-column flex-grow-1 px-1">
+      <h3 class="product-name fw-bold mb-1" :title="product.name">
+        {{ product.name }}
+      </h3>
+
+      <!-- Meta Line: Price | Stock | Category -->
+      <div class="product-meta-line text-muted small mb-2">
+        <span class="fw-bold text-primary">{{ product.price }}</span>
+        <span class="mx-1">·</span>
+        <span>{{ product.stock }} in stock</span>
+      </div>
+
+      <!-- Pastel Tag Pills (Reference Style) -->
+      <div class="d-flex flex-wrap gap-1 mb-3">
+        <span class="chip-pill chip-soft">{{ product.category }}</span>
+        <span v-if="product.tag" class="chip-pill chip-accent">{{ product.tag }}</span>
+        <span
+          class="chip-pill"
+          :class="product.status === 'Out of Stock' ? 'chip-danger' : (product.status === 'Low Stock' ? 'chip-warning' : 'chip-success')"
+        >
+          {{ product.status || 'In Stock' }}
         </span>
-        <span v-else></span>
-
-        <button 
-          class="btn-card-fav border-0 d-flex align-items-center justify-content-center pointer-events-auto"
-          @click.stop="$emit('favorite', product)"
-          :class="{ 'is-fav': isFav }"
-          title="Save to collection"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-          </svg>
-        </button>
       </div>
 
-      <!-- Quick Action Overlay on Hover -->
-      <div class="thumb-hover-action position-absolute bottom-0 start-0 w-100 p-3 d-flex justify-content-between align-items-center">
-        <span class="fw-bold text-white small">{{ product.price }}</span>
-        <button 
-          class="btn btn-sm btn-light rounded-pill px-3 py-1 fw-bold small d-flex align-items-center gap-1 shadow-sm"
-          @click.stop="$emit('buy', product)"
-        >
-          <span>Add to Bag</span>
-          <span>+</span>
-        </button>
-      </div>
+      <!-- Full-Width Rounded CTA Button (Reference Style) -->
+      <button
+        type="button"
+        class="btn-card-cta w-100 rounded-pill py-2 fw-semibold small mt-auto d-flex align-items-center justify-content-center gap-2"
+        :disabled="product.stock <= 0"
+        @click.stop="$emit('buy', product)"
+      >
+        <ShoppingBag :size="15" />
+        <span>{{ product.stock <= 0 ? t('products.outOfStock') : t('products.addToBag') }}</span>
+      </button>
     </div>
-
-    <!-- Bottom Info (Awwwards Meta Row) -->
-    <div class="card-meta-row d-flex align-items-center justify-content-between pt-1">
-      <!-- Left: Avatar + Title + PRO -->
-      <div class="d-flex align-items-center gap-2 overflow-hidden me-2">
-        <div class="author-avatar d-flex align-items-center justify-content-center rounded-circle flex-shrink-0">
-          <span class="fw-bold">{{ (product.name || 'W')[0] }}</span>
-        </div>
-        <div class="product-title-wrap text-truncate">
-          <span class="product-name fw-semibold text-dark text-truncate d-inline-block align-middle me-1">
-            {{ product.name }}
-          </span>
-          <span class="pro-tag text-uppercase align-middle">PRO</span>
-        </div>
-      </div>
-
-      <!-- Right: Badges (DEV / SOTD / Price) -->
-      <div class="d-flex align-items-center gap-1 flex-shrink-0">
-        <span class="badge-tag badge-tag-dev">DEV</span>
-        <span class="badge-tag" v-if="product.category">{{ product.category.slice(0, 4).toUpperCase() }}</span>
-      </div>
-    </div>
-  </div>
+  </article>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed } from 'vue'
+import { Heart, ShoppingBag } from '@lucide/vue'
+import { useProfile } from '../composables/useProfile'
+import { useI18n } from '../composables/useI18n'
 
-const props = defineProps({ 
-  product: { type: Object, required: true } 
+const props = defineProps({
+  product: { type: Object, required: true }
 })
-defineEmits(['buy', 'favorite'])
 
-const isFav = ref(false)
+defineEmits(['buy', 'favorite', 'view'])
+
+const { isProductFavorite } = useProfile()
+const { t } = useI18n()
+
+const isFav = computed(() => isProductFavorite(props.product.id))
 </script>
 
 <style scoped>
-.awwwards-card {
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+.salon-product-card {
+  background-color: var(--storefront-surface, #ffffff);
+  border: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0);
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: none !important;
+  transition: border-color 0.2s ease, transform 0.2s ease;
   cursor: pointer;
 }
 
-.awwwards-card:hover {
-  transform: translateY(-4px);
+.salon-product-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary-color, #EA7A38);
 }
 
-/* Thumbnail */
 .card-thumb-wrap {
-  aspect-ratio: 16 / 11;
-  background-color: var(--color-bg-alt);
+  aspect-ratio: 4 / 3;
+  background-color: var(--surface-ground, #f1f5f9);
   border-radius: 12px;
-  border: 1px solid var(--color-border);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.awwwards-card:hover .card-thumb-wrap {
-  border-color: var(--color-border-hover);
-  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border-clr, #e2e8f0);
 }
 
 .card-thumb-img {
   object-fit: cover;
   display: block;
-  transition: transform 0.4s ease;
+  transition: transform 0.35s ease;
 }
 
-.awwwards-card:hover .card-thumb-img {
-  transform: scale(1.04);
+.salon-product-card:hover .card-thumb-img {
+  transform: scale(1.03);
 }
 
-/* Favorite Icon Button */
 .btn-card-fav {
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.9);
-  color: #111111;
-  backdrop-filter: blur(8px);
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  background-color: var(--storefront-surface, #ffffff);
+  border: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0);
+  color: var(--text-heading-color, #0f172a);
+  transition: border-color 0.18s ease, color 0.18s ease;
+  box-shadow: none !important;
 }
 
-:root.dark-theme .btn-card-fav {
-  background-color: rgba(24, 24, 28, 0.85);
-  color: #f4f4f5;
-}
-
-.btn-card-fav:hover {
-  transform: scale(1.1);
-  background-color: #ffffff;
-  color: var(--color-accent);
-}
-
+.btn-card-fav:hover,
 .btn-card-fav.is-fav {
-  color: var(--color-accent);
+  border-color: var(--danger-color, #ef4444);
+  color: var(--danger-color, #ef4444);
 }
 
-/* Hover Action Bar */
-.thumb-hover-action {
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, transparent 100%);
-  opacity: 0;
-  transform: translateY(6px);
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.awwwards-card:hover .thumb-hover-action {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Author Avatar */
-.author-avatar {
-  width: 22px;
-  height: 22px;
-  background-color: var(--color-heading);
-  color: var(--color-bg);
-  font-size: 0.65rem;
-}
-
-/* Title & Pro Tag */
 .product-name {
-  font-size: 0.88rem;
-  max-width: 140px;
+  font-size: 0.96rem;
+  line-height: 1.35;
+  color: var(--text-heading-color, #0f172a);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.pro-tag {
-  font-size: 0.58rem;
-  font-weight: 800;
-  letter-spacing: 0.4px;
-  color: var(--color-text-lighter);
+.product-meta-line {
+  font-size: 0.8rem;
 }
 
-.pointer-events-none {
-  pointer-events: none;
+.chip-pill {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 9999px;
+  border: 1px solid transparent;
 }
 
-.pointer-events-auto {
-  pointer-events: auto;
+.chip-soft {
+  background-color: var(--surface-ground, #f1f5f9);
+  border-color: var(--border-clr, #e2e8f0);
+  color: var(--text-base, #334155);
+}
+
+.chip-accent {
+  background-color: var(--primary-color-soft);
+  border-color: var(--primary-color-border);
+  color: var(--primary-color, #EA7A38);
+}
+
+.chip-success {
+  background-color: rgba(13, 148, 103, 0.1);
+  border-color: rgba(13, 148, 103, 0.25);
+  color: var(--success-color, #0d9467);
+}
+
+.chip-warning {
+  background-color: rgba(217, 119, 6, 0.1);
+  border-color: rgba(217, 119, 6, 0.25);
+  color: var(--warning-color, #d97706);
+}
+
+.chip-danger {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: var(--danger-color, #ef4444);
+}
+
+.btn-card-cta {
+  background-color: var(--primary-color, #EA7A38);
+  border: var(--border-width, 1.5px) solid var(--primary-color, #EA7A38);
+  color: #ffffff;
+  transition: background-color 0.18s ease, border-color 0.18s ease;
+  box-shadow: none !important;
+}
+
+.btn-card-cta:hover:not(:disabled) {
+  background-color: var(--primary-color-dark, #D46222);
+  border-color: var(--primary-color-dark, #D46222);
+}
+
+.btn-card-cta:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 </style>

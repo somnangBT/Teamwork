@@ -14,11 +14,17 @@ const STATUS_THEME_MAP = {
     APPROVED: 'success',
     DONE: 'success',
     OPENING: 'success',
+    CONFIRMED: 'success',
+    DELIVERED: 'success',
+    IN_STOCK: 'success',
+    ON_DUTY: 'success',
+    PAID: 'success',
 
     // Info / Blue
     IN_PROGRESS: 'info',
     SCHEDULED: 'info',
     PROCESSING: 'info',
+    SHIPPED: 'info',
     REVIEWING: 'info',
     INFO: 'info',
     OPEN: 'info',
@@ -32,6 +38,8 @@ const STATUS_THEME_MAP = {
     WARNING: 'warning',
     PAUSED: 'warning',
     BOOKED: 'warning',
+    LOW_STOCK: 'warning',
+    BREAK: 'warning',
 
     // Danger / Red
     REJECTED: 'danger',
@@ -42,6 +50,7 @@ const STATUS_THEME_MAP = {
     OCCUPIED: 'danger',
     OFFLINE: 'danger',
     ERROR: 'danger',
+    OUT_OF_STOCK: 'danger',
 
     // Secondary / Grey
     ARCHIVED: 'secondary',
@@ -50,7 +59,8 @@ const STATUS_THEME_MAP = {
     UNKNOWN: 'secondary',
     ALL: 'secondary',
     DEFAULT: 'secondary',
-    UNAVAILABLE: 'secondary'
+    UNAVAILABLE: 'secondary',
+    OFF_DUTY: 'secondary'
 };
 
 const STATUS_ICON_MAP = {
@@ -67,11 +77,17 @@ const STATUS_ICON_MAP = {
     APPROVED: CheckCircle2,
     DONE: CheckCircle2,
     OPENING: CheckCircle2,
+    CONFIRMED: CheckCircle2,
+    DELIVERED: CheckCircle2,
+    IN_STOCK: CheckCircle2,
+    ON_DUTY: CheckCircle2,
+    PAID: CheckCircle2,
 
     // Info / Blue
     IN_PROGRESS: RefreshCw,
     SCHEDULED: CalendarClock,
     PROCESSING: RefreshCw,
+    SHIPPED: RefreshCw,
     REVIEWING: Clock,
     INFO: Clock,
     OPEN: Clock,
@@ -85,6 +101,8 @@ const STATUS_ICON_MAP = {
     WARNING: AlertCircle,
     PAUSED: Clock,
     BOOKED: Clock,
+    LOW_STOCK: AlertCircle,
+    BREAK: Clock,
 
     // Danger / Red
     REJECTED: XCircle,
@@ -95,6 +113,7 @@ const STATUS_ICON_MAP = {
     OCCUPIED: XCircle,
     OFFLINE: XCircle,
     ERROR: XCircle,
+    OUT_OF_STOCK: XCircle,
 
     // Secondary / Grey
     ARCHIVED: Archive,
@@ -104,6 +123,7 @@ const STATUS_ICON_MAP = {
     ALL: HelpCircle,
     DEFAULT: HelpCircle,
     UNAVAILABLE: Archive,
+    OFF_DUTY: MinusCircle
 };
 
 export const getStatusBadge = (status, customMap = {}) => {

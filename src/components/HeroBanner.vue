@@ -1,91 +1,55 @@
 <template>
-  <section 
-    class="bloom-hero-section position-relative d-flex align-items-center justify-content-center overflow-hidden" 
+  <section
+    class="bloom-hero-section position-relative overflow-hidden"
     ref="heroContainerRef"
   >
-    
-    <!-- 1. Background Nature Landscape with Scroll Parallax -->
-    <div class="hero-bg-layer position-absolute w-100 h-100 top-0 start-0" ref="bgLayerRef">
-      <img 
-        :src="bgImage" 
-        alt="Bloom Haven Nature Landscape" 
-        class="hero-bg-image w-100 h-100 object-fit-cover" 
-      />
-      <!-- Soft Sunlit Gradient Overlay for Perfect Contrast -->
-      <div class="hero-gradient-overlay position-absolute w-100 h-100 top-0 start-0"></div>
-    </div>
-
-    <!-- 2. Falling Sakura Petals HTML5 Canvas Animation Layer -->
-    <canvas ref="petalsCanvasRef" class="petals-canvas position-absolute w-100 h-100 top-0 start-0"></canvas>
-
-    <!-- 3. Hero Content: Headline, Subtitle, and CTAs -->
-    <div class="container position-relative z-3 text-center px-3 px-md-4 hero-content-box" ref="contentBoxRef">
-      
-      <!-- Headline: Where Nature Meets Modern Living -->
-      <h1 class="bloom-main-title text-white mb-3" ref="titleRef">
-        {{ title }}
-      </h1>
-
-      <!-- Subtitle -->
-      <p class="bloom-subtitle text-white-50 mb-4 mx-auto" ref="subtitleRef">
-        {{ subtitle }}
-      </p>
-
-      <!-- Action Buttons -->
-      <div class="d-flex flex-wrap align-items-center justify-content-center gap-3 pt-2" ref="ctaGroupRef">
-        
-        <!-- Primary CTA: Book Grooming Service -->
-        <router-link 
-          to="/booking" 
-          class="btn-bloom-primary rounded-pill fw-semibold text-decoration-none d-inline-flex align-items-center justify-content-center px-4 py-3"
-        >
-          <span>✨ Book Grooming Service</span>
-        </router-link>
-
-        <!-- Secondary CTA: Browse Products -->
-        <router-link 
-          to="/products" 
-          class="btn-bloom-glass rounded-pill fw-semibold text-decoration-none d-inline-flex align-items-center justify-content-center px-4 py-3"
-        >
-          <span>Browse Pet Products</span>
-        </router-link>
-
+    <div class="hero-media-frame position-relative w-100 overflow-hidden" ref="heroMediaRef">
+      <!-- 1. Background Salon Cover (always preserves full artwork & aspect ratio on all screens) -->
+      <div class="hero-bg-layer w-100" ref="bgLayerRef">
+        <img
+          :src="bgImage"
+          width="1672"
+          height="941"
+          alt="Tiki Tiki Women's Beauty and Hair Salon"
+          class="hero-bg-image w-100 d-block"
+          fetchpriority="high"
+          decoding="async"
+        />
+        <!-- Minimal Soft Edge Overlay to Preserve Bright Cover Colors -->
+        <div class="hero-gradient-overlay position-absolute w-100 h-100 top-0 start-0"></div>
       </div>
 
+      <!-- 2. Falling Sakura Petals HTML5 Canvas Animation Layer -->
+      <canvas ref="petalsCanvasRef" class="petals-canvas position-absolute w-100 h-100 top-0 start-0"></canvas>
     </div>
 
-    <!-- 4. Bottom Mouse Scroll Indicator -->
-    <div class="bloom-scroll-indicator position-absolute bottom-0 start-50 translate-middle-x mb-4 z-3 text-center" ref="scrollIndicatorRef">
-      <div class="scroll-mouse-pill d-inline-flex align-items-start justify-content-center p-1">
-        <div class="scroll-mouse-dot"></div>
-      </div>
-    </div>
-
+    <!-- Accessible screen-reader heading since artwork already displays headline typography -->
+    <h1 class="visually-hidden">{{ title || t('hero.title') }}</h1>
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useBooking } from '../composables/useBooking'
+import { useI18n } from '../composables/useI18n'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const { openBooking } = useBooking()
+const { t } = useI18n()
 
 const props = defineProps({
   title: {
     type: String,
-    default: 'Where Pets Experience Luxury & Care'
+    default: ''
   },
   subtitle: {
     type: String,
-    default: 'Gentle grooming, organic spa hydro-baths, and premium veterinary-approved nutrition for your furry companions.'
+    default: ''
   },
   bgImage: {
     type: String,
-    default: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=1920'
+    default: '/images/coverHero.png'
   }
 })
 
@@ -93,16 +57,14 @@ defineEmits(['explore-click', 'discover-click'])
 
 // Element refs
 const heroContainerRef = ref(null)
+const heroMediaRef = ref(null)
 const bgLayerRef = ref(null)
 const petalsCanvasRef = ref(null)
-const contentBoxRef = ref(null)
-const titleRef = ref(null)
-const subtitleRef = ref(null)
-const ctaGroupRef = ref(null)
-const scrollIndicatorRef = ref(null)
 
 let animationFrameId = null
 let gsapCtx = null
+let resizeHandler = null
+let resizeObserver = null
 
 // --- Canvas Falling Sakura Petals Simulation ---
 class Petal {
@@ -127,9 +89,9 @@ class Petal {
     this.light = 80 + Math.random() * 12
   }
 
-  update(w, h) {
-    this.y += this.speedY
-    this.x += this.speedX + Math.sin(this.y * 0.008) * 0.6
+  update(w, h, scale = 1) {
+    this.y += this.speedY * Math.max(0.55, scale)
+    this.x += (this.speedX + Math.sin(this.y * 0.008) * 0.6) * Math.max(0.55, scale)
     this.rotation += this.rotationSpeed
     this.flip += this.flipSpeed
 
@@ -138,7 +100,8 @@ class Petal {
     }
   }
 
-  draw(ctx) {
+  draw(ctx, scale = 1) {
+    const s = this.size * scale
     ctx.save()
     ctx.translate(this.x, this.y)
     ctx.rotate((this.rotation * Math.PI) / 180)
@@ -146,10 +109,10 @@ class Petal {
 
     ctx.beginPath()
     ctx.moveTo(0, 0)
-    ctx.bezierCurveTo(-this.size * 0.6, -this.size * 0.8, -this.size * 0.5, -this.size * 1.5, 0, -this.size * 1.6)
-    ctx.bezierCurveTo(this.size * 0.5, -this.size * 1.5, this.size * 0.6, -this.size * 0.8, 0, 0)
+    ctx.bezierCurveTo(-s * 0.6, -s * 0.8, -s * 0.5, -s * 1.5, 0, -s * 1.6)
+    ctx.bezierCurveTo(s * 0.5, -s * 1.5, s * 0.6, -s * 0.8, 0, 0)
 
-    const grad = ctx.createLinearGradient(0, 0, 0, -this.size * 1.6)
+    const grad = ctx.createLinearGradient(0, 0, 0, -s * 1.6)
     grad.addColorStop(0, `hsla(${this.hue}, ${this.sat}%, ${this.light}%, ${this.opacity})`)
     grad.addColorStop(1, `hsla(${this.hue + 8}, 85%, 92%, ${this.opacity * 0.7})`)
 
@@ -163,26 +126,43 @@ const initPetalsCanvas = () => {
   const canvas = petalsCanvasRef.value
   if (!canvas) return
 
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
   const ctx = canvas.getContext('2d')
-  let width = (canvas.width = canvas.offsetWidth)
-  let height = (canvas.height = canvas.offsetHeight)
+  if (!ctx) return
 
-  const petalCount = Math.min(32, Math.floor(width / 36))
-  const petals = Array.from({ length: petalCount }, () => new Petal(width, height))
+  let width = 1
+  let height = 1
 
-  const handleResize = () => {
+  const syncSize = () => {
     if (!canvas) return
-    width = canvas.width = canvas.offsetWidth
-    height = canvas.height = canvas.offsetHeight
+    width = canvas.width = Math.max(1, canvas.offsetWidth)
+    height = canvas.height = Math.max(1, canvas.offsetHeight)
   }
-  window.addEventListener('resize', handleResize)
+
+  syncSize()
+
+  const maxPetals = 32
+  const petals = Array.from({ length: maxPetals }, () => new Petal(width, height))
+
+  if (typeof ResizeObserver !== 'undefined' && heroMediaRef.value) {
+    resizeObserver = new ResizeObserver(() => {
+      syncSize()
+    })
+    resizeObserver.observe(heroMediaRef.value)
+  } else {
+    resizeHandler = () => syncSize()
+    window.addEventListener('resize', resizeHandler)
+  }
 
   const render = () => {
     ctx.clearRect(0, 0, width, height)
-    petals.forEach((petal) => {
-      petal.update(width, height)
-      petal.draw(ctx)
-    })
+    const scale = Math.min(1, Math.max(0.48, width / 1200))
+    const activeCount = Math.max(8, Math.min(maxPetals, Math.floor(width / 36)))
+    for (let i = 0; i < activeCount; i++) {
+      petals[i].update(width, height, scale)
+      petals[i].draw(ctx, scale)
+    }
     animationFrameId = requestAnimationFrame(render)
   }
   render()
@@ -192,62 +172,50 @@ onMounted(() => {
   initPetalsCanvas()
 
   gsapCtx = gsap.context(() => {
-    // 1. Entrance Animations
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.15 })
+    const mm = gsap.matchMedia()
+    mm.add('(min-width: 1200px) and (prefers-reduced-motion: no-preference)', () => {
+      const scrollTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: heroMediaRef.value,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true
+        }
+      })
 
-    if (titleRef.value) {
-      tl.from(titleRef.value, { opacity: 0, y: 30, duration: 1.0 }, 0.1)
-    }
-    if (subtitleRef.value) {
-      tl.from(subtitleRef.value, { opacity: 0, y: 20, duration: 0.9 }, 0.25)
-    }
-    if (ctaGroupRef.value) {
-      tl.from(ctaGroupRef.value, { opacity: 0, y: 15, duration: 0.8 }, 0.4)
-    }
-    if (scrollIndicatorRef.value) {
-      tl.from(scrollIndicatorRef.value, { opacity: 0, y: -10, duration: 0.7 }, 0.55)
-    }
-
-    // 2. Ultra-Smooth Hardware-Accelerated ScrollTrigger Parallax (No CSS transition fighting)
-    const scrollTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: heroContainerRef.value,
-        start: 'top top',
-        end: 'bottom top',
-        scrub: true
+      if (bgLayerRef.value) {
+        scrollTl.to(bgLayerRef.value, { yPercent: 18, ease: 'none' }, 0)
       }
     })
-
-    if (bgLayerRef.value) {
-      scrollTl.to(bgLayerRef.value, { yPercent: 22, ease: 'none' }, 0)
-    }
-    if (contentBoxRef.value) {
-      scrollTl.to(contentBoxRef.value, { y: -70, opacity: 0, ease: 'none' }, 0)
-    }
-    if (scrollIndicatorRef.value) {
-      scrollTl.to(scrollIndicatorRef.value, { opacity: 0, ease: 'none' }, 0)
-    }
   }, heroContainerRef.value)
 })
 
 onUnmounted(() => {
   if (animationFrameId) cancelAnimationFrame(animationFrameId)
+  if (resizeObserver) resizeObserver.disconnect()
+  if (resizeHandler) window.removeEventListener('resize', resizeHandler)
   if (gsapCtx) gsapCtx.revert()
 })
 </script>
 
 <style scoped>
-/* Full Viewport Bloom Hero Section */
+/* Responsive Full-Artwork Hero Section (matches computer aspect ratio on every screen) */
 .bloom-hero-section {
-  min-height: 100vh;
-  width: 100%;
+  inline-size: 100%;
+  padding-block: 0;
   position: relative;
-  background-color: #1a1a1a;
+  background-color: var(--storefront-bg, #f7f3ee);
   contain: paint;
+}
+
+.hero-media-frame {
+  inline-size: 100%;
 }
 
 /* Background Layer with Hardware Acceleration */
 .hero-bg-layer {
+  position: relative;
+  inline-size: 100%;
   transform-origin: center center;
   will-change: transform;
   backface-visibility: hidden;
@@ -255,13 +223,22 @@ onUnmounted(() => {
 }
 
 .hero-bg-image {
-  filter: brightness(0.96) saturate(1.08);
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  filter: brightness(1) saturate(1.03);
   will-change: transform;
 }
 
+/* Lightened minimal gradient overlay so the cover artwork stays crisp & vibrant */
 .hero-gradient-overlay {
-  background: radial-gradient(circle at center, rgba(0, 0, 0, 0.08) 0%, rgba(0, 0, 0, 0.35) 100%),
-              linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, transparent 40%, rgba(0, 0, 0, 0.35) 100%);
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.04) 0%,
+    transparent 24%,
+    transparent 76%,
+    rgba(0, 0, 0, 0.14) 100%
+  );
   pointer-events: none;
 }
 
@@ -272,122 +249,10 @@ onUnmounted(() => {
   will-change: transform;
 }
 
-/* Hero Content */
-.hero-content-box {
-  max-width: 900px;
-  margin-top: 3.5rem;
-  will-change: transform, opacity;
-}
-
-/* Luxury Serif Typography */
-.bloom-main-title {
-  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
-  font-size: clamp(2.6rem, 5.5vw, 4.75rem);
-  font-weight: 700;
-  line-height: 1.12;
-  letter-spacing: -0.025em;
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
-}
-
-.bloom-subtitle {
-  font-size: clamp(1rem, 1.35vw, 1.25rem);
-  font-weight: 400;
-  line-height: 1.6;
-  max-width: 680px;
-  color: rgba(255, 255, 255, 0.9) !important;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
-}
-
-/* Primary Coral CTA Button */
-.btn-bloom-primary {
-  background: linear-gradient(135deg, #F06A6A 0%, #E85555 100%);
-  color: #ffffff !important;
-  font-size: 0.96rem;
-  padding: 0.85rem 2rem !important;
-  box-shadow: 0 8px 24px rgba(232, 85, 85, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.btn-bloom-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(232, 85, 85, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  background: linear-gradient(135deg, #f37777 0%, #eb5e5e 100%);
-}
-
-/* Secondary Frosted Glass CTA Button */
-.btn-bloom-glass {
-  background: rgba(45, 50, 42, 0.55);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  color: #ffffff !important;
-  font-size: 0.96rem;
-  padding: 0.85rem 2rem !important;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.btn-bloom-glass:hover {
-  background: rgba(60, 68, 55, 0.75);
-  border-color: rgba(255, 255, 255, 0.45);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-}
-
-/* Mouse Scroll Indicator */
-.bloom-scroll-indicator {
-  cursor: pointer;
-  will-change: transform, opacity;
-}
-
-.scroll-mouse-pill {
-  width: 22px;
-  height: 36px;
-  border: 2px solid rgba(255, 255, 255, 0.75);
-  border-radius: 9999px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-.scroll-mouse-dot {
-  width: 4px;
-  height: 8px;
-  background-color: #ffffff;
-  border-radius: 2px;
-  animation: scrollMouseAnim 1.8s infinite cubic-bezier(0.65, 0, 0.35, 1);
-}
-
-@keyframes scrollMouseAnim {
-  0% {
-    opacity: 0;
-    transform: translateY(2px);
-  }
-  30% {
-    opacity: 1;
-  }
-  70% {
-    opacity: 0.8;
-    transform: translateY(12px);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-}
-
-@media (max-width: 768px) {
-  .hero-content-box {
-    margin-top: 4.5rem;
-  }
-  
-  .bloom-main-title {
-    font-size: 2.3rem;
-  }
-  
-  .btn-bloom-primary,
-  .btn-bloom-glass {
-    width: 100%;
-    max-width: 280px;
+/* On tablets and mobile, clear the fixed top navbar so 100% of the hero artwork is unobstructed */
+@media (max-width: 1199.98px) {
+  .bloom-hero-section {
+    padding-block-start: 58px;
   }
 }
 </style>

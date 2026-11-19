@@ -1,252 +1,488 @@
 <template>
-  <div class="navbar-top-bar d-flex align-items-center justify-content-between gap-3 px-3 px-md-4 py-2">
-    
-    <!-- Left: Logo -->
-    <div class="d-flex align-items-center flex-shrink-0">
-      <!-- Logo -->
-      <router-link to="/" class="brand-logo d-flex align-items-center gap-2 text-decoration-none">
-        <div class="brand-icon">
-          <svg width="34" height="34" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="20" cy="22" r="12" fill="#EA7A38" />
-            <circle cx="9" cy="11" r="5.5" fill="#EA7A38" />
-            <circle cx="31" cy="11" r="5.5" fill="#EA7A38" />
-            <circle cx="16" cy="20" r="2.2" fill="#fff" />
-            <circle cx="24" cy="20" r="2.2" fill="#fff" />
-            <path d="M16 26c1.2 1.6 6.8 1.6 8 0" stroke="#fff" stroke-width="1.8" stroke-linecap="round" />
-          </svg>
-        </div>
-        <span class="brand-name fw-bolder text-dark">Tiki Tiki</span>
-      </router-link>
-    </div>
-
-    <!-- Center: Navigation Links (Active item has Flat White Background without shadow) -->
-    <div class="d-none d-md-flex align-items-center gap-2 nav-menu-links">
-      <router-link 
-        v-for="item in navMenuItems" 
-        :key="item.name" 
-        :to="item.to" 
-        class="nav-link-item text-decoration-none rounded-pill"
-        :class="{ 'active': isItemActive(item) }"
-      >
-        {{ item.name }}
-      </router-link>
-    </div>
-
-    <!-- Right: Book Now CTA + Action Buttons (Cart, Appointments/Profile) -->
-    <div class="d-flex align-items-center gap-2 flex-shrink-0">
-      <!-- Book Now Button -->
-      <router-link 
-        to="/booking"
-        class="btn-book-nav d-inline-flex align-items-center justify-content-center gap-2 rounded-pill text-decoration-none fw-semibold"
-      >
-        <span class="btn-book-icon">✨</span>
-        <span class="d-none d-sm-inline">Book Now</span>
-        <span class="d-sm-none">Book</span>
-      </router-link>
-
-      <!-- Shopping Cart -->
-      <router-link 
-        to="/cart" 
-        class="btn-action-circle rounded-circle d-flex align-items-center justify-content-center text-decoration-none position-relative" 
-        :class="{ 'active': route.path === '/cart' }"
-        title="Shopping Cart"
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="#EA7A38">
-          <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
-        </svg>
-        <span class="appointments-badge-count" v-if="totalQuantity > 0">{{ totalQuantity }}</span>
-      </router-link>
-
-      <!-- User Appointments / Profile Dropdown -->
-      <div class="position-relative" ref="profileDropdownRef">
-        <button 
+  <header>
+    <nav
+      aria-label="Primary"
+      class="navbar-top-bar d-flex align-items-center justify-content-between gap-2 gap-md-3 px-3 px-md-4 py-2"
+    >
+      <!-- Left: Mobile Menu Button + Logo -->
+      <div class="d-flex align-items-center gap-2 flex-shrink-0">
+        <button
+          ref="mobileMenuBtnRef"
           type="button"
-          class="btn-action-circle rounded-circle d-flex align-items-center justify-content-center border-0 position-relative" 
-          :class="{ 'active': route.path === '/profile' || isProfileDropdownOpen }"
-          @click.stop="isProfileDropdownOpen = !isProfileDropdownOpen"
-          title="Profile & Account Menu"
+          class="btn-action-circle rounded-circle d-flex d-md-none align-items-center justify-content-center border-0"
+          :aria-label="t('nav.menu')"
+          :aria-expanded="isMobileMenuOpen ? 'true' : 'false'"
+          aria-controls="mobile-nav-drawer"
+          @click="openMobileDrawer"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="#EA7A38">
-            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-          </svg>
-          <span class="appointments-badge-count" v-if="activeBookingsCount > 0">{{ activeBookingsCount }}</span>
+          <Menu :size="18" />
         </button>
 
-        <!-- Profile Dropdown Card -->
-        <div 
-          v-if="isProfileDropdownOpen" 
-          class="profile-dropdown-menu position-absolute end-0 mt-2 bg-white rounded-4 border shadow-lg p-2.5 z-1060 animate-scale-down"
+        <router-link to="/" class="brand-logo d-flex align-items-center gap-2 text-decoration-none">
+          <div class="brand-icon">
+            <svg width="34" height="34" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+              <rect x="2" y="2" width="36" height="36" rx="12" fill="#EA7A38" />
+              <path d="M20 9C17.4 13.6 17.4 19.6 20 25C22.6 19.6 22.6 13.6 20 9Z" fill="#fff" />
+              <path d="M19.5 24.5C15.5 23.2 11.8 19.5 10.6 15.2C14.7 15.8 18.2 19.2 19.5 24.5Z" fill="#fff" fill-opacity="0.92" />
+              <path d="M20.5 24.5C24.5 23.2 28.2 19.5 29.4 15.2C25.3 15.8 21.8 19.2 20.5 24.5Z" fill="#fff" fill-opacity="0.92" />
+              <path d="M13 28.5C16.2 26.8 23.8 26.8 27 28.5" stroke="#fff" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </div>
+          <span class="brand-name fw-bolder">Tiki Tiki</span>
+        </router-link>
+      </div>
+
+      <!-- Center: Desktop Navigation Links -->
+      <div class="d-none d-md-flex align-items-center gap-1 gap-lg-2 nav-menu-links">
+        <router-link
+          v-for="item in navMenuItems"
+          :key="item.to"
+          :to="item.to"
+          class="nav-link-item text-decoration-none rounded-pill"
+          :class="{ active: isItemActive(item) }"
         >
-          <!-- 1. Profile / Account Header -->
-          <router-link 
-            to="/profile" 
-            class="d-flex align-items-center gap-3 p-2 rounded-3 text-decoration-none user-header-hover mb-1"
-            @click="isProfileDropdownOpen = false"
+          {{ item.label }}
+        </router-link>
+      </div>
+
+      <!-- Right: Book Now CTA + Cart + Profile Dropdown -->
+      <div class="d-flex align-items-center gap-2 flex-shrink-0">
+        <router-link
+          to="/booking"
+          class="btn-book-nav d-inline-flex align-items-center justify-content-center gap-2 rounded-pill text-decoration-none fw-semibold"
+        >
+          <Sparkles :size="14" aria-hidden="true" />
+          <span class="d-none d-sm-inline">{{ t('nav.bookNow') }}</span>
+          <span class="d-sm-none">{{ t('nav.bookShort') }}</span>
+        </router-link>
+
+        <!-- Shopping Cart -->
+        <router-link
+          to="/cart"
+          class="btn-action-circle rounded-circle d-flex align-items-center justify-content-center text-decoration-none position-relative"
+          :class="{ active: route.path === '/cart' }"
+          :aria-label="`${t('nav.cart')} (${totalQuantity})`"
+        >
+          <ShoppingBag :size="17" />
+          <span class="appointments-badge-count" v-if="totalQuantity > 0">{{ totalQuantity }}</span>
+        </router-link>
+
+        <!-- Profile & Account Dropdown -->
+        <div class="position-relative" ref="profileDropdownRef">
+          <button
+            type="button"
+            class="btn-action-circle btn-profile-avatar rounded-circle d-flex align-items-center justify-content-center p-0 position-relative"
+            :class="{
+              active: route.path === '/profile' || isProfileDropdownOpen,
+              'has-avatar': hasAvatarImage
+            }"
+            :aria-expanded="isProfileDropdownOpen ? 'true' : 'false'"
+            aria-label="Profile & Account Menu"
+            @click.stop="isProfileDropdownOpen = !isProfileDropdownOpen"
           >
-            <div class="position-relative">
-              <img 
-                src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=120&q=80" 
-                alt="Avatar" 
-                class="rounded-circle object-fit-cover border"
-                style="width: 42px; height: 42px;"
+            <span
+              v-if="hasAvatarImage"
+              class="profile-avatar-frame w-100 h-100 rounded-circle d-block"
+            >
+              <img
+                :src="account.avatar"
+                :alt="account.name"
+                class="profile-avatar-img w-100 h-100 d-block"
+                @error="avatarLoadError = true"
               />
-              <span class="badge-mini-gold position-absolute bottom-0 end-0 rounded-circle text-white d-flex align-items-center justify-content-center">★</span>
-            </div>
-            <div class="overflow-hidden">
-              <div class="d-flex align-items-center gap-1.5">
-                <strong class="text-dark fs-6 text-truncate d-block">Alisa Gitten</strong>
-                <span class="badge bg-orange-soft text-orange fw-bold" style="font-size: 0.65rem;">VIP</span>
-              </div>
-              <span class="text-muted small text-truncate d-block" style="font-size: 0.76rem;">View Profile &amp; Settings</span>
-            </div>
-          </router-link>
-
-          <hr class="my-1.5 opacity-10" />
-
-          <!-- 2. Language Selector -->
-          <div class="px-2 py-1.5">
-            <div class="d-flex align-items-center justify-content-between mb-1">
-              <span class="small fw-semibold text-muted d-flex align-items-center gap-1.5">
-                <span>🌐</span>
-                <span>Language</span>
-              </span>
-              <span class="small text-muted fw-medium" style="font-size: 0.75rem;">{{ currentLanguage === 'en' ? 'English' : 'ភាសាខ្មែរ' }}</span>
-            </div>
-            <div class="d-flex gap-1 bg-toggle-wrap p-1 rounded-3">
-              <button 
-                type="button" 
-                class="btn-toggle-option flex-grow-1 py-1 rounded-2 small fw-semibold border-0"
-                :class="{ 'active': currentLanguage === 'en' }"
-                @click="setLanguage('en')"
-              >
-                🇺🇸 EN
-              </button>
-              <button 
-                type="button" 
-                class="btn-toggle-option flex-grow-1 py-1 rounded-2 small fw-semibold border-0"
-                :class="{ 'active': currentLanguage === 'kh' }"
-                @click="setLanguage('kh')"
-              >
-                🇰🇭 KH
-              </button>
-            </div>
-          </div>
-
-          <!-- 3. Light / Dark Mode Switcher -->
-          <div class="px-2 py-1.5">
-            <div class="d-flex align-items-center justify-content-between mb-1">
-              <span class="small fw-semibold text-muted d-flex align-items-center gap-1.5">
-                <span>🌓</span>
-                <span>Theme</span>
-              </span>
-              <span class="small text-muted fw-medium" style="font-size: 0.75rem;">{{ isDarkMode ? 'Dark Mode' : 'Light Mode' }}</span>
-            </div>
-            <div class="d-flex gap-1 bg-toggle-wrap p-1 rounded-3">
-              <button 
-                type="button" 
-                class="btn-toggle-option flex-grow-1 py-1 rounded-2 small fw-semibold border-0 d-flex align-items-center justify-content-center gap-1"
-                :class="{ 'active': !isDarkMode }"
-                @click="toggleTheme('light')"
-              >
-                <span>☀️</span>
-                <span>Light</span>
-              </button>
-              <button 
-                type="button" 
-                class="btn-toggle-option flex-grow-1 py-1 rounded-2 small fw-semibold border-0 d-flex align-items-center justify-content-center gap-1"
-                :class="{ 'active': isDarkMode }"
-                @click="toggleTheme('dark')"
-              >
-                <span>🌙</span>
-                <span>Dark</span>
-              </button>
-            </div>
-          </div>
-
-          <hr class="my-1.5 opacity-10" />
-
-          <!-- 4. Admin Management Portal Link -->
-          <router-link 
-            to="/admin/dashboard" 
-            class="profile-menu-item d-flex align-items-center justify-content-between p-2 rounded-3 text-decoration-none small"
-            @click="isProfileDropdownOpen = false"
-          >
-            <div class="d-flex align-items-center gap-2">
-              <span>⚡</span>
-              <span class="fw-semibold text-dark">Admin Portal</span>
-            </div>
-            <span class="badge bg-orange text-white rounded-pill px-2 py-0.5" style="font-size: 0.65rem;">Pro</span>
-          </router-link>
-
-          <hr class="my-1.5 opacity-10" />
-
-          <!-- 5. Log out -->
-          <button 
-            type="button" 
-            class="profile-menu-item logout-btn d-flex align-items-center gap-2 p-2 rounded-3 text-decoration-none text-danger small w-100 border-0 bg-transparent"
-            @click="handleLogout"
-          >
-            <span>🚪</span>
-            <span class="fw-medium">Log out</span>
+            </span>
+            <User v-else :size="17" />
+            <span class="appointments-badge-count" v-if="activeBookingsCount > 0">{{ activeBookingsCount }}</span>
           </button>
+
+          <!-- Profile Dropdown Card -->
+          <div
+            v-if="isProfileDropdownOpen"
+            class="profile-dropdown-menu position-absolute end-0 mt-2 rounded-4 p-2 z-1060 animate-scale-down"
+          >
+            <!-- 1. Profile Header -->
+            <router-link
+              to="/profile"
+              class="d-flex align-items-center gap-3 p-2 rounded-3 text-decoration-none user-header-hover mb-1"
+              @click="isProfileDropdownOpen = false"
+            >
+              <div class="position-relative flex-shrink-0">
+                <img
+                  v-if="hasAvatarImage"
+                  :src="account.avatar"
+                  :alt="account.name"
+                  class="dropdown-header-avatar rounded-circle object-fit-cover border d-block"
+                  @error="avatarLoadError = true"
+                />
+                <span
+                  v-else
+                  class="dropdown-header-avatar rounded-circle border d-flex align-items-center justify-content-center bg-orange-soft text-orange"
+                >
+                  <User :size="18" />
+                </span>
+                <span class="badge-mini-gold position-absolute bottom-0 end-0 rounded-circle text-white d-flex align-items-center justify-content-center">★</span>
+              </div>
+              <div class="overflow-hidden">
+                <div class="d-flex align-items-center gap-1">
+                  <strong class="dropdown-user-name fs-6 text-truncate d-block">{{ account.name }}</strong>
+                  <span class="badge bg-orange-soft text-orange fw-bold" style="font-size: 0.65rem;">{{ account.tier || 'VIP' }}</span>
+                </div>
+                <span class="text-muted small text-truncate d-block" style="font-size: 0.76rem;">{{ t('nav.profile') }}</span>
+              </div>
+            </router-link>
+
+            <hr class="my-1 opacity-10" />
+
+            <!-- 2. Language Selector -->
+            <div class="px-2 py-1">
+              <div class="d-flex align-items-center justify-content-between mb-1">
+                <span class="small fw-semibold text-muted d-flex align-items-center gap-1">
+                  <Globe :size="14" />
+                  <span>{{ t('nav.language') }}</span>
+                </span>
+                <span class="small text-muted fw-medium" style="font-size: 0.75rem;">
+                  {{ currentLang === 'en' ? 'English' : 'ភាសាខ្មែរ' }}
+                </span>
+              </div>
+              <div class="d-flex gap-1 bg-toggle-wrap p-1 rounded-3">
+                <button
+                  type="button"
+                  class="btn-toggle-option flex-grow-1 py-1 rounded-2 small fw-semibold border-0"
+                  :class="{ active: currentLang === 'en' }"
+                  @click="setLanguage('en')"
+                >
+                  🇺🇸 EN
+                </button>
+                <button
+                  type="button"
+                  class="btn-toggle-option flex-grow-1 py-1 rounded-2 small fw-semibold border-0"
+                  :class="{ active: currentLang === 'kh' }"
+                  @click="setLanguage('kh')"
+                >
+                  🇰🇭 KH
+                </button>
+              </div>
+            </div>
+
+            <!-- 3. Light / Dark Mode Switcher -->
+            <div class="px-2 py-1">
+              <div class="d-flex align-items-center justify-content-between mb-1">
+                <span class="small fw-semibold text-muted d-flex align-items-center gap-1">
+                  <Sun v-if="!isDarkMode" :size="14" />
+                  <Moon v-else :size="14" />
+                  <span>{{ t('nav.theme') }}</span>
+                </span>
+                <span class="small text-muted fw-medium" style="font-size: 0.75rem;">
+                  {{ isDarkMode ? t('nav.darkMode') : t('nav.lightMode') }}
+                </span>
+              </div>
+              <div class="d-flex gap-1 bg-toggle-wrap p-1 rounded-3">
+                <button
+                  type="button"
+                  class="btn-toggle-option flex-grow-1 py-1 rounded-2 small fw-semibold border-0 d-flex align-items-center justify-content-center gap-1"
+                  :class="{ active: !isDarkMode }"
+                  @click="toggleTheme('light')"
+                >
+                  <Sun :size="13" />
+                  <span>{{ t('nav.light') }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="btn-toggle-option flex-grow-1 py-1 rounded-2 small fw-semibold border-0 d-flex align-items-center justify-content-center gap-1"
+                  :class="{ active: isDarkMode }"
+                  @click="toggleTheme('dark')"
+                >
+                  <Moon :size="13" />
+                  <span>{{ t('nav.dark') }}</span>
+                </button>
+              </div>
+            </div>
+
+            <hr class="my-1 opacity-10" />
+
+            <!-- 4. Quick Links: My Bookings, Admin Portal & Sign In -->
+            <router-link
+              to="/booking"
+              class="profile-menu-item d-flex align-items-center justify-content-between p-2 rounded-3 text-decoration-none small"
+              @click="isProfileDropdownOpen = false"
+            >
+              <div class="d-flex align-items-center gap-2">
+                <CalendarCheck :size="15" class="text-orange" />
+                <span class="fw-semibold">{{ t('nav.bookings') }}</span>
+              </div>
+              <span v-if="activeBookingsCount > 0" class="badge bg-orange-soft text-orange rounded-pill px-2">
+                {{ activeBookingsCount }}
+              </span>
+            </router-link>
+
+            <router-link
+              to="/admin/dashboard"
+              class="profile-menu-item d-flex align-items-center justify-content-between p-2 rounded-3 text-decoration-none small"
+              @click="isProfileDropdownOpen = false"
+            >
+              <div class="d-flex align-items-center gap-2">
+                <ShieldCheck :size="15" class="text-orange" />
+                <span class="fw-semibold">{{ t('nav.adminPortal') }}</span>
+              </div>
+              <span class="badge bg-orange text-white rounded-pill px-2 py-0.5" style="font-size: 0.65rem;">Pro</span>
+            </router-link>
+
+            <router-link
+              to="/login"
+              class="profile-menu-item d-flex align-items-center gap-2 p-2 rounded-3 text-decoration-none small"
+              @click="isProfileDropdownOpen = false"
+            >
+              <LogIn :size="15" class="text-muted" />
+              <span class="fw-medium">{{ t('nav.signIn') }}</span>
+            </router-link>
+
+            <hr class="my-1 opacity-10" />
+
+            <!-- 5. Log out -->
+            <button
+              type="button"
+              class="profile-menu-item logout-btn d-flex align-items-center gap-2 p-2 rounded-3 text-danger small w-100 border-0 bg-transparent"
+              @click="openLogoutConfirm"
+            >
+              <LogOut :size="15" />
+              <span class="fw-medium">{{ t('nav.logout') }}</span>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </nav>
 
-  </div>
+    <!-- Native Modal <dialog> Mobile Navigation Drawer (Accessible, Escape/Light-dismiss) -->
+    <dialog
+      id="mobile-nav-drawer"
+      ref="mobileDrawerRef"
+      class="mobile-drawer"
+      aria-label="Mobile Navigation"
+      @click="onDrawerBackdropClick"
+      @close="onDrawerClosed"
+    >
+      <div class="mobile-drawer-sheet d-flex flex-column justify-content-between p-4" @click.stop>
+        <div>
+          <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom">
+            <router-link
+              to="/"
+              class="brand-logo d-flex align-items-center gap-2 text-decoration-none"
+              @click="closeMobileDrawer"
+            >
+              <svg width="30" height="30" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                <rect x="2" y="2" width="36" height="36" rx="12" fill="#EA7A38" />
+                <path d="M20 9C17.4 13.6 17.4 19.6 20 25C22.6 19.6 22.6 13.6 20 9Z" fill="#fff" />
+                <path d="M19.5 24.5C15.5 23.2 11.8 19.5 10.6 15.2C14.7 15.8 18.2 19.2 19.5 24.5Z" fill="#fff" fill-opacity="0.92" />
+                <path d="M20.5 24.5C24.5 23.2 28.2 19.5 29.4 15.2C25.3 15.8 21.8 19.2 20.5 24.5Z" fill="#fff" fill-opacity="0.92" />
+                <path d="M13 28.5C16.2 26.8 23.8 26.8 27 28.5" stroke="#fff" stroke-width="2" stroke-linecap="round" />
+              </svg>
+              <span class="brand-name fw-bolder fs-5">Tiki Tiki</span>
+            </router-link>
+
+            <button
+              type="button"
+              class="btn-close-drawer border-0 rounded-circle d-flex align-items-center justify-content-center"
+              aria-label="Close menu"
+              autofocus
+              @click="closeMobileDrawer"
+            >
+              <X :size="18" />
+            </button>
+          </div>
+
+          <ul class="list-unstyled d-flex flex-column gap-1 mb-4">
+            <li v-for="item in mobileMenuItems" :key="item.to">
+              <router-link
+                :to="item.to"
+                class="mobile-nav-link d-flex align-items-center justify-content-between px-3 py-2.5 rounded-3 text-decoration-none fw-semibold"
+                :class="{ active: isItemActive(item) }"
+                @click="closeMobileDrawer"
+              >
+                <span class="d-flex align-items-center gap-2">
+                  <component :is="item.icon" :size="17" />
+                  <span>{{ item.label }}</span>
+                </span>
+                <span v-if="item.badge" class="badge bg-orange text-white rounded-pill">{{ item.badge }}</span>
+              </router-link>
+            </li>
+          </ul>
+
+          <div class="d-flex flex-column gap-2 pt-3 border-top">
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="small fw-semibold text-muted">{{ t('nav.language') }}</span>
+              <div class="d-flex gap-1 bg-toggle-wrap p-1 rounded-3">
+                <button
+                  type="button"
+                  class="btn-toggle-option px-2 py-1 rounded-2 small fw-semibold border-0"
+                  :class="{ active: currentLang === 'en' }"
+                  @click="setLanguage('en')"
+                >
+                  EN
+                </button>
+                <button
+                  type="button"
+                  class="btn-toggle-option px-2 py-1 rounded-2 small fw-semibold border-0"
+                  :class="{ active: currentLang === 'kh' }"
+                  @click="setLanguage('kh')"
+                >
+                  KH
+                </button>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="small fw-semibold text-muted">{{ t('nav.theme') }}</span>
+              <div class="d-flex gap-1 bg-toggle-wrap p-1 rounded-3">
+                <button
+                  type="button"
+                  class="btn-toggle-option px-2 py-1 rounded-2 small fw-semibold border-0"
+                  :class="{ active: !isDarkMode }"
+                  @click="toggleTheme('light')"
+                >
+                  {{ t('nav.light') }}
+                </button>
+                <button
+                  type="button"
+                  class="btn-toggle-option px-2 py-1 rounded-2 small fw-semibold border-0"
+                  :class="{ active: isDarkMode }"
+                  @click="toggleTheme('dark')"
+                >
+                  {{ t('nav.dark') }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-3 border-top d-flex flex-column gap-2">
+          <router-link
+            to="/admin/dashboard"
+            class="btn-tnak-outline text-center text-decoration-none d-flex align-items-center justify-content-center gap-2"
+            @click="closeMobileDrawer"
+          >
+            <ShieldCheck :size="16" />
+            <span>{{ t('nav.adminPortal') }}</span>
+          </router-link>
+          <router-link
+            to="/login"
+            class="btn-tnak-primary text-center text-decoration-none d-flex align-items-center justify-content-center gap-2"
+            @click="closeMobileDrawer"
+          >
+            <LogIn :size="16" />
+            <span>{{ t('nav.signIn') }}</span>
+          </router-link>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Logout Confirmation Modal -->
+    <BaseModal v-model="showLogoutModal" title="Confirm Logout" size="sm">
+      <p class="mb-0 text-muted small">Are you sure you want to log out of your customer session?</p>
+      <template #footer>
+        <BaseButton variant="outline-secondary" class="flex-grow-1" @click="showLogoutModal = false">
+          Cancel
+        </BaseButton>
+        <BaseButton variant="danger" class="flex-grow-1" @click="confirmLogout">
+          Log out
+        </BaseButton>
+      </template>
+    </BaseModal>
+  </header>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import {
+  Menu, X, Sparkles, ShoppingBag, User, Globe, Sun, Moon,
+  CalendarCheck, ShieldCheck, LogIn, LogOut, Home, Package, Scissors
+} from '@lucide/vue'
 import { useBooking } from '../../composables/useBooking'
 import { useTheme } from '../../composables/useTheme'
 import { useCart } from '../../composables/useCart'
+import { useProfile } from '../../composables/useProfile'
+import { useI18n } from '../../composables/useI18n'
+import { useAuthStore } from '../../stores/auth'
+import { useToastStore } from '../../stores/toast'
 
 const route = useRoute()
 const router = useRouter()
 const { activeBookingsCount } = useBooking()
 const { isDarkMode, toggleTheme } = useTheme()
 const { totalQuantity } = useCart()
+const { account } = useProfile()
+const { currentLang, setLanguage, t } = useI18n()
+const authStore = useAuthStore()
+const toastStore = useToastStore()
 
 const isProfileDropdownOpen = ref(false)
 const profileDropdownRef = ref(null)
-const currentLanguage = ref(localStorage.getItem('salon_lang') || 'en')
+const avatarLoadError = ref(false)
+const hasAvatarImage = computed(() => Boolean(account.value?.avatar && !avatarLoadError.value))
 
-const setLanguage = (lang) => {
-  currentLanguage.value = lang
-  try {
-    localStorage.setItem('salon_lang', lang)
-  } catch (e) {
-    console.error(e)
+watch(
+  () => account.value?.avatar,
+  () => {
+    avatarLoadError.value = false
   }
-}
+)
+const isMobileMenuOpen = ref(false)
+const mobileDrawerRef = ref(null)
+const mobileMenuBtnRef = ref(null)
+const showLogoutModal = ref(false)
 
-const handleLogout = () => {
-  isProfileDropdownOpen.value = false
-  if (confirm('Are you sure you want to log out?')) {
-    router.push('/')
-  }
-}
+const navMenuItems = computed(() => [
+  { label: t('nav.home'), to: '/' },
+  { label: t('nav.products'), to: '/products' },
+  { label: t('nav.services'), to: '/services' },
+  { label: t('nav.bookings'), to: '/booking' }
+])
 
-defineProps({
-  cartCount: {
-    type: Number,
-    default: 0
-  }
-})
-
-const navMenuItems = [
-  { name: 'Home', to: '/' },
-  { name: 'Products', to: '/products' },
-  { name: 'Services', to: '/services' }
-]
+const mobileMenuItems = computed(() => [
+  { label: t('nav.home'), to: '/', icon: Home },
+  { label: t('nav.products'), to: '/products', icon: Package },
+  { label: t('nav.services'), to: '/services', icon: Scissors },
+  { label: t('nav.bookings'), to: '/booking', icon: CalendarCheck, badge: activeBookingsCount.value || null },
+  { label: t('nav.cart'), to: '/cart', icon: ShoppingBag, badge: totalQuantity.value || null },
+  { label: t('profile.title'), to: '/profile', icon: User }
+])
 
 const isItemActive = (item) => {
   if (item.to === '/') {
     return route.path === '/' && !route.hash
   }
   return route.path === item.to || route.path.startsWith(item.to + '/')
+}
+
+const openMobileDrawer = () => {
+  isMobileMenuOpen.value = true
+  mobileDrawerRef.value?.showModal()
+}
+
+const closeMobileDrawer = () => {
+  mobileDrawerRef.value?.close()
+}
+
+const onDrawerClosed = () => {
+  isMobileMenuOpen.value = false
+}
+
+const onDrawerBackdropClick = (event) => {
+  if (event.target === mobileDrawerRef.value) {
+    closeMobileDrawer()
+  }
+}
+
+const openLogoutConfirm = () => {
+  isProfileDropdownOpen.value = false
+  showLogoutModal.value = true
+}
+
+const confirmLogout = async () => {
+  showLogoutModal.value = false
+  await authStore.logout(false)
+  toastStore.showToast('Signed out successfully.', 'info')
+  router.push('/login')
 }
 
 const handleClickOutside = (event) => {
@@ -265,7 +501,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* 1. Navbar Container: Glassmorphism Effect, Flush to Top */
 .navbar-top-bar {
   position: fixed;
   top: 0;
@@ -274,24 +509,23 @@ onUnmounted(() => {
   width: calc(100% - 32px);
   max-width: 1248px;
   z-index: 1050;
-  
-  /* Glassmorphism background */
-  background: rgba(255, 255, 255, 0.62) !important;
-  backdrop-filter: blur(18px) saturate(170%);
-  -webkit-backdrop-filter: blur(18px) saturate(170%);
-  
-  border-left: 1px solid rgba(255, 255, 255, 0.85);
-  border-right: 1px solid rgba(255, 255, 255, 0.85);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
-  border-top: none !important;
-  border-top-left-radius: 0 !important;
-  border-top-right-radius: 0 !important;
-  border-bottom-left-radius: 24px !important;
-  border-bottom-right-radius: 24px !important;
-  min-height: 56px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05) !important;
-  margin: 0 !important;
-  transition: background 0.3s ease, border-color 0.3s ease;
+  background: color-mix(in srgb, var(--storefront-surface, #ffffff) 88%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-left: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0);
+  border-right: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0);
+  border-bottom: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0);
+  border-top: none;
+  border-radius: 0 0 18px 18px;
+  min-height: 58px;
+  box-shadow: none !important;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+[data-theme="dark"] .navbar-top-bar {
+  background: color-mix(in srgb, var(--storefront-surface, #131c31) 90%, transparent);
+  border-color: var(--border-clr);
+  box-shadow: none !important;
 }
 
 @media (max-width: 576px) {
@@ -299,114 +533,113 @@ onUnmounted(() => {
     width: 100%;
     left: 0;
     transform: none;
-    border-radius: 0 0 16px 16px !important;
+    border-left: none;
+    border-right: none;
+    border-radius: 0 0 14px 14px;
   }
 }
 
-/* Brand */
-.brand-logo {
-  cursor: pointer;
-}
-
 .brand-name {
-  font-size: 1.45rem;
+  font-size: 1.35rem;
   letter-spacing: -0.03em;
   line-height: 1;
-  color: #1a1a1a !important;
+  color: var(--text-heading-color, #0f172a);
 }
 
-/* Book Now Pill Button (Reduced Size) */
 .btn-book-nav {
   height: 36px;
-  background: linear-gradient(135deg, #EA7A38 0%, #d96928 100%);
+  background-color: var(--primary-color, #EA7A38);
+  border: var(--border-width, 1.5px) solid var(--primary-color, #EA7A38);
   color: #ffffff;
   font-size: 0.82rem;
-  font-weight: 600;
   padding: 0 14px;
-  border-radius: 9999px;
-  box-shadow: 0 3px 10px rgba(234, 122, 56, 0.25);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: pointer;
+  box-shadow: none !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
   white-space: nowrap;
 }
 
 .btn-book-nav:hover {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 5px 14px rgba(234, 122, 56, 0.35);
+  background-color: var(--primary-color-dark, #D46222);
+  border-color: var(--primary-color-dark, #D46222);
   color: #ffffff;
 }
 
-.btn-book-icon {
-  font-size: 0.8rem;
-}
-
-.nav-booking-badge {
-  font-size: 0.7rem;
-  background-color: #EA7A38;
-  color: #ffffff;
-  padding: 1px 6px;
-  border-radius: 9999px;
-  font-weight: 700;
-}
-
-.navbar-center-pill {
-  height: auto;
-}
-
-/* Nav Links Styling */
 .nav-link-item {
-  color: #4b5563;
+  color: var(--text-base, #334155);
   font-size: 0.84rem;
   font-weight: 500;
-  padding: 0.4rem 1.05rem;
-  border-radius: 9999px;
-  transition: all 0.2s ease;
+  padding: 0.38rem 0.95rem;
+  border: var(--border-width, 1.5px) solid transparent;
+  transition: all 0.18s ease;
   white-space: nowrap;
 }
 
 .nav-link-item:hover {
-  color: #111827;
-  background-color: rgba(0, 0, 0, 0.03);
+  color: var(--text-heading-color, #0f172a);
+  background-color: var(--surface-ground, #f1f5f9);
+  border-color: var(--border-clr, #e2e8f0);
 }
 
 .nav-link-item.active {
-  background-color: #ffffff !important;
-  color: #EA7A38 !important;
-  box-shadow: none !important; /* No shadow */
-  border: 1px solid rgba(255, 255, 255, 0.9);
+  background-color: var(--primary-color-soft);
+  color: var(--primary-color, #EA7A38);
+  font-weight: 600;
+  border: var(--border-width, 1.5px) solid var(--primary-color-border);
 }
 
-/* 3. Action Circle Buttons */
 .btn-action-circle {
   width: 36px;
   height: 36px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  color: #EA7A38;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
+  flex-shrink: 0;
+  background: var(--storefront-surface, #ffffff);
+  border: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0);
+  color: var(--primary-color, #EA7A38);
+  transition: border-color 0.18s ease, background-color 0.18s ease;
   cursor: pointer;
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
 .btn-action-circle:hover {
-  background-color: #ffffff;
-  transform: scale(1.06);
+  border-color: var(--primary-color, #EA7A38);
+  background-color: var(--primary-color-soft);
 }
 
 .btn-action-circle.active {
-  background-color: #ffffff !important;
-  border-color: #EA7A38;
-  box-shadow: 0 0 0 2px rgba(234, 122, 56, 0.25);
+  border-color: var(--primary-color, #EA7A38);
+  background-color: var(--primary-color-soft);
+  box-shadow: none !important;
+}
+
+.btn-profile-avatar.has-avatar,
+.btn-profile-avatar.has-avatar:hover,
+.btn-profile-avatar.has-avatar.active {
+  background-color: transparent;
+}
+
+.profile-avatar-frame {
+  overflow: hidden;
+  overflow: clip;
+}
+
+.profile-avatar-img {
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+.dropdown-header-avatar {
+  width: 42px;
+  height: 42px;
+  object-position: center 20%;
 }
 
 .appointments-badge-count {
   position: absolute;
-  top: -2px;
-  right: -2px;
-  min-width: 16px;
-  height: 16px;
-  background-color: #EA7A38;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  background-color: var(--primary-color, #EA7A38);
   color: #ffffff;
   font-size: 0.65rem;
   font-weight: 700;
@@ -414,94 +647,134 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px solid #ffffff;
-  padding: 0 3px;
+  border: 2px solid var(--storefront-surface, #ffffff);
+  padding: 0 4px;
 }
 
-.cart-badge-dot {
-  position: absolute;
-  top: 7px;
-  right: 7px;
-  width: 7px;
-  height: 7px;
-  background-color: #ef4444;
-  border-radius: 50%;
-  border: 1.5px solid #ffffff;
-}
-
-/* 4. Profile Dropdown Menu Styling */
 .profile-dropdown-menu {
-  width: 275px;
+  width: 280px;
   top: calc(100% + 10px);
-  background-color: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.12), 0 8px 16px -4px rgba(0, 0, 0, 0.04);
+  background-color: var(--storefront-surface, #ffffff);
+  border: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0) !important;
+  color: var(--text-base, #334155);
+  box-shadow: none !important;
+}
+
+.dropdown-user-name {
+  color: var(--text-heading-color, #0f172a);
 }
 
 .user-header-hover {
-  background-color: #f8fafc;
-  transition: background-color 0.18s ease;
+  background-color: var(--surface-ground, #f1f5f9);
+  border: 1px solid var(--border-clr, #e2e8f0);
+  transition: border-color 0.18s ease, background-color 0.18s ease;
 }
 
 .user-header-hover:hover {
-  background-color: #fff7ed;
+  background-color: var(--primary-color-soft);
+  border-color: var(--primary-color-border);
 }
 
 .badge-mini-gold {
   width: 15px;
   height: 15px;
-  background: #ea580c;
+  background: var(--primary-color, #EA7A38);
   font-size: 0.55rem;
   line-height: 1;
-  border: 1.5px solid #ffffff;
+  border: 1.5px solid var(--storefront-surface, #ffffff);
 }
 
 .bg-orange-soft {
-  background-color: rgba(234, 122, 56, 0.12) !important;
+  background-color: var(--primary-color-soft) !important;
 }
 
 .text-orange {
-  color: #ea580c !important;
+  color: var(--primary-color, #EA7A38) !important;
 }
 
 .bg-orange {
-  background-color: #ea580c !important;
+  background-color: var(--primary-color, #EA7A38) !important;
 }
 
 .profile-menu-item {
-  color: #334155;
+  color: var(--text-base, #334155);
+  border: 1px solid transparent;
   transition: all 0.18s ease;
 }
 
 .profile-menu-item:hover {
-  background-color: #f1f5f9;
-  color: #0f172a;
+  background-color: var(--surface-ground, #f1f5f9);
+  border-color: var(--border-clr, #e2e8f0);
+  color: var(--text-heading-color, #0f172a);
 }
 
 .bg-toggle-wrap {
-  background-color: #f1f5f9;
+  background-color: var(--surface-ground, #f1f5f9);
+  border: 1px solid var(--border-clr, #e2e8f0);
 }
 
 .btn-toggle-option {
   background: transparent;
-  color: #64748b;
+  color: var(--secondary-color, #64748b);
   font-size: 0.78rem;
+  border: 1px solid transparent !important;
   transition: all 0.16s ease;
   cursor: pointer;
 }
 
-.btn-toggle-option:hover:not(.active) {
-  color: #0f172a;
-}
-
 .btn-toggle-option.active {
-  background-color: #ffffff;
-  color: #0f172a;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  background-color: var(--storefront-surface, #ffffff);
+  color: var(--primary-color, #EA7A38);
+  border-color: var(--primary-color-border) !important;
+  box-shadow: none !important;
 }
 
 .logout-btn:hover {
-  background-color: #fef2f2 !important;
+  background-color: rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Native Modal Mobile Drawer */
+.mobile-drawer {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  width: min(20rem, 85vw);
+  max-width: 100vw;
+  height: 100svh;
+  max-height: 100svh;
+}
+
+.mobile-drawer::backdrop {
+  background: rgba(15, 23, 42, 0.52);
+  backdrop-filter: blur(4px);
+}
+
+.mobile-drawer-sheet {
+  width: 100%;
+  height: 100%;
+  background: var(--body-bg-color, #ffffff);
+  color: var(--text-base, #334155);
+  overflow-y: auto;
+}
+
+.btn-close-drawer {
+  width: 34px;
+  height: 34px;
+  background: var(--surface-ground, #f1f5f9);
+  color: var(--text-heading-color, #0f172a);
+}
+
+.mobile-nav-link {
+  color: var(--text-base, #334155);
+  padding: 10px 14px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.mobile-nav-link:hover,
+.mobile-nav-link.active {
+  background: var(--primary-color-soft, rgba(234, 122, 56, 0.12));
+  color: var(--primary-color, #EA7A38);
 }
 
 .animate-scale-down {
@@ -520,7 +793,7 @@ onUnmounted(() => {
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 480px) {
   .brand-name {
     display: none;
   }

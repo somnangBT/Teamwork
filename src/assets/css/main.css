@@ -1,15 +1,106 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Inter:wght@300;400;500;600;700;800;900&family=Kantumruy+Pro:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600;1,700&display=swap');
 @import './variables.css';
+
+html {
+    accent-color: var(--primary-color, #EA7A38);
+}
 
 body {
     background-color: var(--body-bg-color, #ffffff);
-    font-family: 'Poppins', 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--text-base, #334155);
+    font-family: 'Poppins', 'Kantumruy Pro', 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
 body.tnak-theme {
     background-color: var(--surface-ground, #f1f5f9);
+}
+
+/* ==========================================================================
+   Global Zero-Shadow & Crisp Border System
+   ========================================================================== */
+.shadow,
+.shadow-sm,
+.shadow-md,
+.shadow-lg,
+.shadow-xs,
+.card,
+.btn,
+.form-control,
+.form-select,
+.dropdown-menu,
+.modal-content,
+.p-dialog,
+.p-drawer,
+.p-menu,
+.p-select,
+.p-multiselect,
+.p-select-overlay,
+.p-multiselect-overlay,
+.p-datepicker-panel,
+.p-inputtext {
+    box-shadow: none !important;
+}
+
+.border {
+    border: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0) !important;
+}
+
+.border-top {
+    border-top: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0) !important;
+}
+
+.border-bottom {
+    border-bottom: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0) !important;
+}
+
+.border-start {
+    border-left: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0) !important;
+}
+
+.border-end {
+    border-right: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0) !important;
+}
+
+/* Native <dialog> modal scroll containment & accessibility utilities */
+dialog:modal {
+    overscroll-behavior: contain;
+}
+
+dialog::backdrop {
+    overflow: hidden;
+    overscroll-behavior: contain;
+}
+
+:where(a:any-link, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--primary-color, #EA7A38);
+    outline-offset: 2px;
+}
+
+.visually-hidden:where(:not(:focus-within, :active)) {
+    position: absolute !important;
+    clip-path: inset(50%) !important;
+    overflow: hidden !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    white-space: nowrap !important;
+}
+
+.skip-link:focus {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 2000;
+    background: var(--primary-color, #EA7A38);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 9999px;
+    font-weight: 600;
+    text-decoration: none;
 }
 
 h1,
@@ -19,7 +110,7 @@ h4,
 h5,
 h6,
 .brand-icon {
-    font-family: 'Poppins', 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Poppins', 'Kantumruy Pro', 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 .text-primary {
@@ -66,13 +157,18 @@ section {
 }
 
 .card {
-    border: none !important;
+    border: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0);
     border-radius: var(--border-radius);
+    background-color: var(--storefront-surface, #ffffff);
+}
+
+.card.border-0 {
+    border: none !important;
 }
 
 .cta-btn {
-    border: none;
-    padding: 8px 12px;
+    border: var(--border-width, 1.5px) solid var(--primary-color);
+    padding: 8px 14px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -134,7 +230,6 @@ section {
     max-width: var(--truncate-1-lines-width);
 }
 
-/* Global Responsive Typography */
 @media (max-width: 991px) {
     .section-title h2 {
         font-size: 36px;
@@ -191,125 +286,154 @@ section {
 
 .main-divider {
     height: 1px;
-    background-color: var(--border-clr, rgba(15, 23, 42, 0.08));
+    background-color: var(--border-clr, #e2e8f0);
     width: 100%;
 }
 
-/* TNAK Design System Reusable Components */
-.tnak-card {
-    background-color: #ffffff;
-    border-radius: var(--border-radius, 10px);
-    border: 1px solid var(--border-clr, rgba(15, 23, 42, 0.08)) !important;
+.min-w-0 {
+    min-inline-size: 0 !important;
+    min-width: 0 !important;
 }
 
-.tnak-control {
-    height: var(--control-height, 42px);
-    border-radius: 8px;
-    border: 1px solid rgba(15, 23, 42, 0.12);
-    padding: 0.45rem 0.8rem;
-    background-color: #ffffff;
+/* ==========================================================================
+   Reusable Tnak / Salon Flat Border Components (Zero Shadow)
+   ========================================================================== */
+.tnak-card {
+    background-color: var(--storefront-surface, #ffffff);
+    border-radius: var(--border-radius, 12px);
+    border: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0) !important;
+    box-shadow: none !important;
+    transition: border-color 0.2s ease;
+}
+
+.tnak-card:hover {
+    border-color: var(--border-hover-color) !important;
+}
+
+.tnak-control,
+.form-control,
+.form-select {
+    border-radius: var(--border-inner-radius, 8px);
+    border: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0);
+    background-color: var(--storefront-surface, #ffffff);
     color: var(--text-heading-color, #0f172a);
     font-size: 0.88rem;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.2s ease;
+    box-shadow: none !important;
+}
+
+.tnak-control:hover,
+.form-control:hover,
+.form-select:hover {
+    border-color: var(--border-hover-color);
+}
+
+.tnak-control:focus,
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color, #EA7A38) !important;
+    background-color: var(--storefront-surface, #ffffff);
+    box-shadow: none !important;
 }
 
 .awwwards-pill {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    height: 36px;
-    padding: 0.35rem 0.85rem;
-    background-color: #ffffff;
-    border: 1px solid rgba(15, 23, 42, 0.12);
-    border-radius: 8px;
+    height: 38px;
+    padding: 0.35rem 0.9rem;
+    background-color: var(--storefront-surface, #ffffff);
+    border: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0);
+    border-radius: var(--border-inner-radius, 8px);
     color: var(--text-heading-color, #0f172a);
     font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
     outline: none;
+    box-shadow: none !important;
 }
 
 .awwwards-pill:hover {
-    background-color: var(--surface-ground, #f8fafc);
-    border-color: var(--border-hover-color, #94a3b8);
+    background-color: var(--surface-hover, #f8fafc);
+    border-color: var(--border-hover-color);
     color: var(--text-heading-color, #0f172a);
 }
 
 .awwwards-pill.active {
-    background-color: var(--primary-color-soft, rgba(234, 122, 56, 0.12));
+    background-color: var(--primary-color-soft);
     border-color: var(--primary-color, #EA7A38);
     color: var(--primary-color, #EA7A38);
     font-weight: 600;
 }
 
-.tnak-control:focus {
-    border-color: var(--primary-color, #EA7A38);
-    box-shadow: 0 0 0 3px rgba(234, 122, 56, 0.15);
-    background-color: #ffffff;
-}
-
 .btn-tnak-primary {
     background-color: var(--primary-color, #EA7A38);
     color: #ffffff;
-    border: 1px solid var(--primary-color, #EA7A38);
-    border-radius: 8px;
+    border: var(--border-width, 1.5px) solid var(--primary-color, #EA7A38);
+    border-radius: var(--border-inner-radius, 8px);
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
     font-weight: 600;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    box-shadow: none !important;
 }
 
 .btn-tnak-primary:hover {
-    background-color: var(--primary-color-dark, #D96928);
+    background-color: var(--primary-color-dark, #D46222);
+    border-color: var(--primary-color-dark, #D46222);
     color: #ffffff;
 }
 
 .btn-tnak-outline {
-    background-color: #ffffff;
-    color: var(--text-base, #334155);
-    border: 1px solid rgba(15, 23, 42, 0.15);
-    border-radius: 8px;
+    background-color: var(--storefront-surface, #ffffff);
+    color: var(--text-heading-color, #0f172a);
+    border: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0);
+    border-radius: var(--border-inner-radius, 8px);
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
     font-weight: 600;
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+    box-shadow: none !important;
 }
 
 .btn-tnak-outline:hover {
-    background-color: var(--surface-ground, #f8fafc);
-    border-color: var(--border-hover-color, #94a3b8);
-    color: var(--text-heading-color, #0f172a);
+    background-color: var(--surface-hover, #f8fafc);
+    border-color: var(--primary-color, #EA7A38);
+    color: var(--primary-color, #EA7A38);
 }
 
 .btn-tnak-danger {
     background-color: var(--danger-color, #ef4444);
     color: #ffffff;
-    border: 1px solid var(--danger-color, #ef4444);
-    border-radius: 8px;
+    border: var(--border-width, 1.5px) solid var(--danger-color, #ef4444);
+    border-radius: var(--border-inner-radius, 8px);
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
     font-weight: 600;
+    box-shadow: none !important;
 }
 
 .btn-tnak-danger:hover {
     background-color: #dc2626;
+    border-color: #dc2626;
     color: #ffffff;
 }
 
 .btn-tnak-danger-sm {
-    background-color: var(--danger-color, #ef4444);
-    color: #ffffff;
-    border: none;
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--danger-color, #ef4444);
+    border: 1px solid rgba(239, 68, 68, 0.3);
     border-radius: 6px;
-    padding: 0.28rem 0.65rem;
-    font-size: 0.76rem;
+    padding: 0.26rem 0.65rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    transition: background-color 0.15s ease;
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .btn-tnak-danger-sm:hover {
-    background-color: #dc2626;
+    background-color: var(--danger-color, #ef4444);
+    color: #ffffff;
 }
 
 .tnak-status-badge {
@@ -323,22 +447,22 @@ section {
 .status-badge-success {
     background-color: rgba(13, 148, 103, 0.12);
     color: var(--success-color, #0d9467);
-    border: 1px solid rgba(13, 148, 103, 0.25);
+    border: 1px solid rgba(13, 148, 103, 0.28);
 }
 
 .status-badge-warning {
-    background-color: rgba(245, 158, 11, 0.12);
+    background-color: rgba(217, 119, 6, 0.12);
     color: var(--warning-color, #d97706);
-    border: 1px solid rgba(245, 158, 11, 0.25);
+    border: 1px solid rgba(217, 119, 6, 0.28);
 }
 
 .status-badge-danger {
     background-color: rgba(239, 68, 68, 0.12);
     color: var(--danger-color, #ef4444);
-    border: 1px solid rgba(239, 68, 68, 0.25);
+    border: 1px solid rgba(239, 68, 68, 0.28);
 }
 
-/* Custom Max-Width App Container (Exactly matching floating navbar width) */
+/* Custom Max-Width App Container */
 .app-container {
     width: calc(100% - 32px);
     max-width: 1248px;
@@ -356,8 +480,7 @@ section {
     }
 }
 
-/* Prime vue class override */
-
+/* PrimeVue Overrides (Border-driven, Zero Shadow) */
 .p-tab {
     margin: 0 0 0.5rem 0 !important;
     padding: 6px 15px !important;
@@ -377,7 +500,7 @@ section {
 .p-tab-active {
     border-radius: var(--border-inner-radius) !important;
     background-color: var(--body-bg-color) !important;
-    border: none !important;
+    border: var(--border-width) solid var(--border-clr) !important;
 }
 
 .p-tablist-active-bar {
@@ -394,56 +517,8 @@ section {
     color: var(--primary-color) !important;
 }
 
-@keyframes tab-fade-in {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes tab-slide-in {
-    from {
-        opacity: 0;
-        transform: translateX(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes tab-zoom-in {
-    from {
-        opacity: 0;
-        transform: scale(0.98);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-:root:not([data-page-transition="none"]) .p-tabpanel {
-    animation: tab-fade-in 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-:root[data-page-transition="slide"] .p-tabpanel {
-    animation: tab-slide-in 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-:root[data-page-transition="zoom"] .p-tabpanel {
-    animation: tab-zoom-in 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
 .p-drawer {
-    border: none !important;
+    border: var(--border-width) solid var(--border-clr) !important;
     background-color: var(--surface-ground) !important;
     border-radius: var(--border-inner-radius) !important;
     overflow: hidden;
@@ -461,27 +536,52 @@ section {
 
 .p-drawer-header {
     background-color: var(--body-bg-color);
-    border-radius: calc(var(--border-inner-radius) - 0.5rem) !important;
+    border-radius: calc(var(--border-inner-radius) - 0.25rem) !important;
+    border: var(--border-width) solid var(--border-clr) !important;
     padding: 1rem !important;
 }
 
 .p-dialog {
     border-radius: var(--border-radius) !important;
     background-color: var(--surface-ground) !important;
-    border: none !important;
+    border: var(--border-width) solid var(--border-clr) !important;
     color: var(--text-base) !important;
+    padding: 0.5rem !important;
+}
+
+.p-dialog .p-dialog-header {
+    background-color: var(--body-bg-color) !important;
+    border: var(--border-width) solid var(--border-clr) !important;
+    border-radius: var(--border-inner-radius) !important;
+    padding: 0.9rem 1.15rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.p-dialog .p-dialog-content {
+    background-color: var(--body-bg-color) !important;
+    border: var(--border-width) solid var(--border-clr) !important;
+    border-radius: var(--border-inner-radius) !important;
+    padding: 1.15rem !important;
+}
+
+.p-dialog .p-dialog-footer {
+    background-color: var(--body-bg-color) !important;
+    border: var(--border-width) solid var(--border-clr) !important;
+    border-radius: var(--border-inner-radius) !important;
+    padding: 0.85rem 1.15rem !important;
+    margin-top: 0.5rem !important;
 }
 
 .p-menu {
     background-color: var(--body-bg-color) !important;
-    border: none !important;
-    border-radius: var(--border-inner-radius) !important;
-    padding: 0.25rem;
+    border: var(--border-width) solid var(--border-clr) !important;
+    border-radius: var(--border-radius) !important;
+    padding: 0.3rem;
 }
 
 .p-menu-list {
     background-color: var(--surface-ground) !important;
-    border-radius: calc(var(--border-inner-radius) - 0.25rem) !important;
+    border-radius: var(--border-inner-radius) !important;
 }
 
 .p-menu-item-content {
@@ -495,14 +595,12 @@ section {
     transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-/* FADE */
 :root[data-page-transition="fade"] .fade-enter-from,
 :root[data-page-transition="fade"] .fade-leave-to {
     opacity: 0;
     transform: translateY(10px);
 }
 
-/* SLIDE */
 :root[data-page-transition="slide"] .fade-enter-from {
     opacity: 0;
     transform: translateX(-20px);
@@ -513,14 +611,12 @@ section {
     transform: translateX(20px);
 }
 
-/* ZOOM */
 :root[data-page-transition="zoom"] .fade-enter-from,
 :root[data-page-transition="zoom"] .fade-leave-to {
     opacity: 0;
     transform: scale(0.97);
 }
 
-/* NONE */
 :root[data-page-transition="none"] .fade-enter-active,
 :root[data-page-transition="none"] .fade-leave-active {
     transition: none !important;

@@ -63,21 +63,23 @@ import { useRouter } from 'vue-router';
 import { Settings, LogOut, Sun, Moon } from '@lucide/vue';
 import BaseModal from '@/components/base/BaseModal.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
+import { useTheme } from '@/composables/useTheme';
 
 const props = defineProps({
     profileRouteName: {
         type: String,
-        default: 'dashboard'
+        default: 'admin-dashboard'
     },
     settingsRouteName: {
         type: String,
-        default: 'dashboard'
+        default: 'admin-settings'
     }
 });
 
 const authStore = useAuthStore();
 const router = useRouter();
 const user = computed(() => authStore.user);
+const { theme, toggleTheme } = useTheme();
 
 const isOpen = ref(false);
 const containerRef = ref(null);
@@ -90,26 +92,6 @@ const close = () => {
     isOpen.value = false;
 };
 
-const savedAppearance = JSON.parse(localStorage.getItem('app-Appearance')) || {};
-const savedTheme = savedAppearance.theme || localStorage.getItem('app-theme') || 'light';
-const theme = ref(savedTheme);
-
-const toggleTheme = () => {
-    const newTheme = theme.value === 'light' ? 'dark' : 'light';
-    theme.value = newTheme;
-    document.documentElement.setAttribute('data-theme', newTheme);
-    const appAppearance = JSON.parse(localStorage.getItem('app-Appearance')) || {};
-    appAppearance.theme = newTheme;
-    localStorage.setItem('app-Appearance', JSON.stringify(appAppearance));
-    localStorage.setItem('app-theme', newTheme);
-    window.dispatchEvent(new Event('theme-changed'));
-};
-
-const handleThemeChange = () => {
-    const appearance = JSON.parse(localStorage.getItem('app-Appearance')) || {};
-    theme.value = appearance.theme || localStorage.getItem('app-theme') || 'light';
-};
-
 const handleClickOutside = (event) => {
     if (isOpen.value && containerRef.value && !containerRef.value.contains(event.target)) {
         close();
@@ -118,12 +100,10 @@ const handleClickOutside = (event) => {
 
 onMounted(() => {
     document.addEventListener('click', handleClickOutside);
-    window.addEventListener('theme-changed', handleThemeChange);
 });
 
 onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside);
-    window.removeEventListener('theme-changed', handleThemeChange);
 });
 
 const showLogoutModal = ref(false);
@@ -139,7 +119,7 @@ const handleLogout = async () => {
     const res = await authStore.logout();
     if (res) {
         showLogoutModal.value = false;
-        router.push({ name: 'Home' });
+        router.push({ name: 'home' });
     }
     isLoggingOut.value = false;
 };
