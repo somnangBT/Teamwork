@@ -19,27 +19,89 @@
         <!-- LEFT SIDEBAR -->
         <aside class="profile-sidebar-column flex-shrink-0">
           <div class="profile-nav-card">
-            <nav aria-label="Profile sections" class="d-flex flex-column">
-              <button
-                v-for="item in sidebarItems"
-                :key="item.id"
-                type="button"
-                class="profile-sidebar-item border-0 text-start"
-                :class="{ active: activeSection === item.id, 'support-highlight-item': item.id === 'support' }"
-                @click="scrollToSection(item.id)"
-              >
-                <span class="nav-icon">{{ item.emoji }}</span>
-                <span class="item-text">{{ item.label }}</span>
-              </button>
+            <!-- Mini Identity Header -->
+            <div class="sidebar-identity-box rounded-3 p-3 mb-3">
+              <div class="d-flex align-items-center gap-3 min-w-0">
+                <div class="position-relative flex-shrink-0">
+                  <img
+                    :src="account.avatar"
+                    :alt="account.name"
+                    class="sidebar-avatar rounded-circle object-fit-cover border d-block"
+                  />
+                  <span class="sidebar-online-dot" aria-hidden="true"></span>
+                </div>
+                <div class="min-w-0 flex-grow-1">
+                  <div class="d-flex align-items-center gap-1 mb-0">
+                    <strong class="sidebar-user-name text-truncate">{{ account.name }}</strong>
+                    <span class="sidebar-tier-pill flex-shrink-0">{{ account.tier || 'VIP' }}</span>
+                  </div>
+                  <div class="sidebar-user-email text-muted text-truncate">{{ account.email }}</div>
+                </div>
+                <button
+                  type="button"
+                  class="btn-mobile-logout d-lg-none rounded-3 border d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                  :aria-label="t('profile.logout')"
+                  :title="t('profile.logout')"
+                  @click="showLogoutModal = true"
+                >
+                  <LogOut :size="15" />
+                </button>
+              </div>
 
-              <div class="sidebar-spacer"></div>
+              <!-- Quick Summary Strip (Desktop) -->
+              <div class="sidebar-quick-stats d-none d-lg-grid mt-3 pt-2 border-top">
+                <button type="button" class="quick-stat-btn border-0 bg-transparent p-1 rounded-2" @click="scrollToSection('pets')">
+                  <span class="quick-stat-num d-block fw-bold">{{ pets.length }}</span>
+                  <span class="quick-stat-lbl d-block">{{ isKhmer ? 'ទម្រង់' : 'Profiles' }}</span>
+                </button>
+                <button type="button" class="quick-stat-btn border-0 bg-transparent p-1 rounded-2" @click="scrollToSection('vouchers')">
+                  <span class="quick-stat-num d-block fw-bold">{{ vouchers.length }}</span>
+                  <span class="quick-stat-lbl d-block">{{ isKhmer ? 'ប័ណ្ណ' : 'Vouchers' }}</span>
+                </button>
+                <button type="button" class="quick-stat-btn border-0 bg-transparent p-1 rounded-2" @click="scrollToSection('orders')">
+                  <span class="quick-stat-num d-block fw-bold">{{ customerOrders.length }}</span>
+                  <span class="quick-stat-lbl d-block">{{ isKhmer ? 'ការបញ្ជាទិញ' : 'Orders' }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Grouped Navigation -->
+            <nav aria-label="Profile sections" class="sidebar-nav-shell">
+              <div class="sidebar-nav-list">
+                <template v-for="(group, gIdx) in sidebarGroups" :key="group.title">
+                  <div class="sidebar-group-label d-none d-lg-block" :class="{ 'mt-2': gIdx > 0 }">
+                    {{ group.title }}
+                  </div>
+                  <button
+                    v-for="item in group.items"
+                    :key="item.id"
+                    type="button"
+                    class="profile-sidebar-item text-start"
+                    :class="{ active: activeSection === item.id }"
+                    :aria-current="activeSection === item.id ? 'location' : undefined"
+                    @click="scrollToSection(item.id)"
+                  >
+                    <span class="sidebar-item-icon rounded-3 d-inline-flex align-items-center justify-content-center flex-shrink-0">
+                      <component :is="item.icon" :size="15" />
+                    </span>
+                    <span class="item-text text-truncate flex-grow-1">{{ item.label }}</span>
+                    <span v-if="item.count !== null && item.count !== undefined" class="sidebar-count-pill flex-shrink-0">
+                      {{ item.count }}
+                    </span>
+                  </button>
+                </template>
+              </div>
+
+              <div class="main-divider my-3 d-none d-lg-block"></div>
 
               <button
                 type="button"
-                class="profile-sidebar-item logout-item border-0 text-start"
+                class="profile-sidebar-item logout-item text-start d-none d-lg-flex"
                 @click="showLogoutModal = true"
               >
-                <span class="nav-icon text-danger">🚪</span>
+                <span class="sidebar-item-icon logout-icon-box rounded-3 d-inline-flex align-items-center justify-content-center flex-shrink-0">
+                  <LogOut :size="15" />
+                </span>
                 <span class="item-text text-danger">{{ t('profile.logout') }}</span>
               </button>
             </nav>
@@ -47,7 +109,7 @@
         </aside>
 
         <!-- RIGHT CONTENT CARDS -->
-        <main class="profile-cards-column flex-grow-1 w-100">
+        <main class="profile-cards-column flex-grow-1 w-100 min-w-0">
           <!-- 1. ACCOUNT -->
           <section id="account" class="ref-card mb-4">
             <h2 class="ref-card-title fw-bold mb-4">{{ t('profile.account') }}</h2>
@@ -557,9 +619,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Trash2 } from '@lucide/vue'
+import {
+  Trash2, User, Sparkles, Ticket, ShoppingBag, MapPin, CreditCard, MessageCircle, LogOut
+} from '@lucide/vue'
 import { useProfile } from '../../../composables/useProfile'
 import { useAdmin } from '../../../composables/useAdmin'
 import { useCart } from '../../../composables/useCart'
@@ -569,7 +633,7 @@ import { useToastStore } from '../../../stores/toast'
 const route = useRoute()
 const router = useRouter()
 const toastStore = useToastStore()
-const { t } = useI18n()
+const { t, isKhmer } = useI18n()
 const { orders } = useAdmin()
 const { applyPromo } = useCart()
 
@@ -597,20 +661,39 @@ const {
 const activeSection = ref('account')
 const showPetBanner = ref(true)
 
-const sidebarItems = computed(() => [
-  { id: 'account', label: t('profile.account'), emoji: '👤' },
-  { id: 'pets', label: t('profile.pets'), emoji: '🌸' },
-  { id: 'vouchers', label: t('profile.vouchers'), emoji: '🎟️' },
-  { id: 'orders', label: t('profile.orders'), emoji: '🧾' },
-  { id: 'addresses', label: t('profile.addresses'), emoji: '📍' },
-  { id: 'billing', label: t('profile.billing'), emoji: '💳' },
-  { id: 'support', label: t('profile.support'), emoji: '💬' }
+const customerOrders = computed(() => orders.value)
+
+const sidebarGroups = computed(() => [
+  {
+    title: isKhmer.value ? 'គណនី និងការថែទាំ' : 'Account & Care',
+    items: [
+      { id: 'account', label: t('profile.account'), icon: User, count: null },
+      { id: 'pets', label: t('profile.pets'), icon: Sparkles, count: pets.value.length },
+      { id: 'vouchers', label: t('profile.vouchers'), icon: Ticket, count: vouchers.value.length }
+    ]
+  },
+  {
+    title: isKhmer.value ? 'ការបញ្ជាទិញ និងជំនួយ' : 'Orders & Support',
+    items: [
+      { id: 'orders', label: t('profile.orders'), icon: ShoppingBag, count: customerOrders.value.length },
+      { id: 'addresses', label: t('profile.addresses'), icon: MapPin, count: addresses.value.length },
+      { id: 'billing', label: t('profile.billing'), icon: CreditCard, count: billingMethods.value.length },
+      { id: 'support', label: t('profile.support'), icon: MessageCircle, count: supportTickets.value.length || null }
+    ]
+  }
 ])
 
-const customerOrders = computed(() => orders.value)
+let scrollLockTimer = null
+let isManualScroll = false
+let sectionObserver = null
 
 const scrollToSection = (sectionId) => {
   activeSection.value = sectionId
+  isManualScroll = true
+  if (scrollLockTimer) clearTimeout(scrollLockTimer)
+  scrollLockTimer = setTimeout(() => {
+    isManualScroll = false
+  }, 650)
   const element = document.getElementById(sectionId)
   if (element) {
     element.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -787,13 +870,41 @@ const confirmLogout = () => {
   router.push('/login')
 }
 
+let hashScrollTimer = null
+
 onMounted(() => {
   window.scrollTo(0, 0)
   if (route.hash) {
     const id = route.hash.replace('#', '')
     activeSection.value = id
-    setTimeout(() => scrollToSection(id), 150)
+    hashScrollTimer = setTimeout(() => scrollToSection(id), 150)
   }
+
+  if (typeof IntersectionObserver !== 'undefined') {
+    const sectionIds = ['account', 'pets', 'vouchers', 'orders', 'addresses', 'billing', 'support']
+    sectionObserver = new IntersectionObserver(
+      (entries) => {
+        if (isManualScroll) return
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+        if (visible.length > 0 && visible[0].target?.id) {
+          activeSection.value = visible[0].target.id
+        }
+      },
+      { rootMargin: '-96px 0px -55% 0px', threshold: 0.05 }
+    )
+    sectionIds.forEach((id) => {
+      const el = document.getElementById(id)
+      if (el) sectionObserver.observe(el)
+    })
+  }
+})
+
+onUnmounted(() => {
+  if (scrollLockTimer) clearTimeout(scrollLockTimer)
+  if (hashScrollTimer) clearTimeout(hashScrollTimer)
+  if (sectionObserver) sectionObserver.disconnect()
 })
 </script>
 
@@ -836,7 +947,7 @@ onMounted(() => {
 }
 
 .profile-sidebar-column {
-  width: 245px;
+  width: 276px;
   position: sticky;
   top: 76px;
 }
@@ -849,46 +960,224 @@ onMounted(() => {
 }
 
 .profile-nav-card {
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 14px;
 }
 
+.sidebar-identity-box {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color-soft, rgba(234, 122, 56, 0.1)) 0%,
+    var(--surface-ground, #f8fafc) 100%
+  );
+  border: 1px solid var(--border-clr, #e2e8f0);
+}
+
+.sidebar-avatar {
+  width: 42px;
+  height: 42px;
+  border-color: var(--primary-color-border, rgba(234, 122, 56, 0.4)) !important;
+}
+
+.sidebar-online-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background-color: var(--success-color, #10b981);
+  border: 2px solid var(--storefront-surface, #ffffff);
+}
+
+.sidebar-user-name {
+  font-size: 0.9rem;
+  color: var(--text-heading-color, #0f172a);
+  line-height: 1.25;
+}
+
+.sidebar-user-email {
+  font-size: 0.72rem;
+  line-height: 1.3;
+}
+
+.sidebar-tier-pill {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 9999px;
+  background-color: var(--primary-color, #EA7A38);
+  color: #ffffff;
+  letter-spacing: 0.03em;
+}
+
+.btn-mobile-logout {
+  width: 34px;
+  height: 34px;
+  background-color: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.25) !important;
+  color: var(--danger-color, #ef4444);
+  cursor: pointer;
+}
+
+.sidebar-quick-stats {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  border-color: var(--border-clr, #e2e8f0) !important;
+}
+
+.quick-stat-btn {
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.16s ease;
+}
+
+.quick-stat-btn:hover {
+  background-color: var(--storefront-surface, #ffffff) !important;
+}
+
+.quick-stat-num {
+  font-size: 0.92rem;
+  color: var(--primary-color, #EA7A38);
+  line-height: 1.2;
+}
+
+.quick-stat-lbl {
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--secondary-color, #64748b);
+}
+
+.sidebar-group-label {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--secondary-color, #64748b);
+  padding: 4px 10px 6px;
+}
+
+.sidebar-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .profile-sidebar-item {
+  position: relative;
   width: 100%;
   background: transparent;
-  padding: 10px 14px;
-  border-radius: 14px;
-  color: var(--text-base, #374151);
-  font-size: 0.9rem;
+  border: 1px solid transparent;
+  padding: 8px 10px;
+  border-radius: 12px;
+  color: var(--text-base, #334155);
+  font-size: 0.86rem;
   font-weight: 600;
-  margin-bottom: 6px;
-  transition: all 0.16s ease;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.2s ease;
   display: flex;
   align-items: center;
   gap: 10px;
+  cursor: pointer;
 }
 
-.profile-sidebar-item:hover:not(.active) {
+.profile-sidebar-item:focus-visible {
+  outline: 2px solid var(--primary-color, #EA7A38);
+  outline-offset: 2px;
+}
+
+.sidebar-item-icon {
+  width: 30px;
+  height: 30px;
   background-color: var(--surface-ground, #f1f5f9);
+  color: var(--secondary-color, #64748b);
+  border: 1px solid var(--border-clr, #e2e8f0);
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.2s ease;
+}
+
+.sidebar-count-pill {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 9999px;
+  background-color: var(--surface-ground, #f1f5f9);
+  color: var(--secondary-color, #64748b);
+  border: 1px solid var(--border-clr, #e2e8f0);
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.profile-sidebar-item:hover:not(.active):not(.logout-item) {
+  background-color: var(--surface-ground, #f8fafc);
+  border-color: var(--border-clr, #e2e8f0);
+  color: var(--text-heading-color, #0f172a);
+}
+
+.profile-sidebar-item:hover:not(.active):not(.logout-item) .sidebar-item-icon {
+  color: var(--primary-color, #EA7A38);
+  border-color: var(--primary-color-border, rgba(234, 122, 56, 0.35));
+  background-color: var(--primary-color-soft, rgba(234, 122, 56, 0.1));
 }
 
 .profile-sidebar-item.active {
   background-color: var(--primary-color-soft, #FBF2EB);
+  border-color: var(--primary-color-border, rgba(234, 122, 56, 0.35));
   color: var(--primary-color, #EA7A38);
   font-weight: 700;
 }
 
-.support-highlight-item {
-  background-color: rgba(234, 122, 56, 0.06);
+.profile-sidebar-item.active::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 22%;
+  bottom: 22%;
+  width: 3px;
+  border-radius: 9999px;
+  background-color: var(--primary-color, #EA7A38);
 }
 
-.sidebar-spacer {
-  height: 24px;
+.profile-sidebar-item.active .sidebar-item-icon {
+  background-color: var(--primary-color, #EA7A38);
+  border-color: var(--primary-color, #EA7A38);
+  color: #ffffff;
+}
+
+.profile-sidebar-item.active .sidebar-count-pill {
+  background-color: var(--storefront-surface, #ffffff);
+  color: var(--primary-color, #EA7A38);
+  border-color: var(--primary-color-border, rgba(234, 122, 56, 0.35));
+}
+
+.logout-icon-box {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: var(--danger-color, #ef4444);
+}
+
+.logout-item:hover {
+  background-color: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.28);
+}
+
+.logout-item:hover .logout-icon-box {
+  background-color: var(--danger-color, #ef4444);
+  border-color: var(--danger-color, #ef4444);
+  color: #ffffff;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .profile-sidebar-item:hover:not(.active) {
+    transform: translateX(3px);
+  }
+
+  .profile-sidebar-item:active {
+    transform: scale(0.98);
+  }
 }
 
 .ref-card {
   border-radius: 16px;
   padding: 24px 26px;
+  scroll-margin-top: 78px;
 }
 
 .account-avatar {
@@ -992,13 +1281,49 @@ onMounted(() => {
   font-size: 0.85rem;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 991.98px) {
   .profile-sidebar-column {
     width: 100%;
     position: static;
   }
-  .sidebar-spacer {
-    height: 10px;
+
+  .profile-nav-card {
+    padding: 12px;
+  }
+
+  .sidebar-nav-list {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 8px;
+    padding-bottom: 4px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+
+  .profile-sidebar-item {
+    width: auto;
+    flex: 0 0 auto;
+    padding: 6px 12px 6px 8px;
+    border-radius: 9999px;
+    scroll-snap-align: start;
+    border-color: var(--border-clr, #e2e8f0);
+    background-color: var(--surface-ground, #f8fafc);
+  }
+
+  .profile-sidebar-item.active::before {
+    display: none;
+  }
+
+  .sidebar-item-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 50% !important;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .profile-sidebar-item:hover:not(.active) {
+      transform: translateY(-1px);
+    }
   }
 }
 </style>

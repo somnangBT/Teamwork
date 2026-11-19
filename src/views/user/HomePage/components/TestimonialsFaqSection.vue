@@ -1,14 +1,14 @@
 <template>
-  <section class="testimonials-faq-section py-5">
+  <section ref="sectionRef" class="testimonials-faq-section py-5">
     <div class="container">
       <!-- Testimonials -->
-      <div class="text-center mb-4">
+      <div class="text-center mb-4 reveal-header">
         <span class="badge-tag-pill d-inline-block mb-2">{{ t('home.testimonialsBadge') }}</span>
         <h2 class="display-6 fw-bold mb-0 section-heading">{{ t('home.testimonialsTitle') }}</h2>
       </div>
 
-      <div class="row g-4 mb-5">
-        <div v-for="review in reviews" :key="review.author" class="col-12 col-md-4">
+      <div ref="reviewsRowRef" class="row g-4 mb-5">
+        <div v-for="review in reviews" :key="review.author" class="col-12 col-md-4 reveal-review-col">
           <div class="review-card rounded-4 border p-4 h-100 d-flex flex-column justify-content-between">
             <div>
               <div class="d-flex align-items-center gap-1 text-warning mb-3" aria-label="5 out of 5 stars">
@@ -28,7 +28,7 @@
       </div>
 
       <!-- FAQ & CTA Split -->
-      <div class="row g-4 align-items-stretch mb-5">
+      <div ref="faqSplitRef" class="row g-4 align-items-stretch mb-5">
         <div class="col-12 col-lg-7 d-flex flex-column">
           <div class="mb-3">
             <span class="badge-tag-pill d-inline-block mb-2">FAQ</span>
@@ -116,13 +116,21 @@
       </div>
 
       <!-- Studio Location & Interactive Map -->
-      <article class="location-map-card rounded-4 border overflow-hidden">
-        <div class="row g-0 align-items-stretch">
-          <div class="col-12 col-lg-5 p-4 p-md-5 d-flex flex-column justify-content-between gap-4">
-            <div>
-              <span class="badge-tag-pill d-inline-block mb-2">{{ t('home.visitBadge') }}</span>
-              <h3 class="h4 fw-bold mb-2 section-heading">{{ t('home.visitTitle') }}</h3>
-              <p class="text-muted small mb-4" style="line-height: 1.6;">
+      <article
+        ref="locationCardRef"
+        class="location-map-card rounded-4 border overflow-hidden position-relative"
+        :style="locationSpotlightStyle"
+        @pointermove="onLocationPointerMove"
+        @pointerleave="onLocationPointerLeave"
+      >
+        <div class="location-card-spotlight" aria-hidden="true"></div>
+        <div class="row g-0 align-items-stretch position-relative" style="z-index: 1;">
+          <div class="col-12 col-lg-5 p-4 p-md-5 d-flex flex-column justify-content-between gap-4 location-copy-col position-relative">
+            <div class="location-ambient-orb" aria-hidden="true"></div>
+            <div class="position-relative" style="z-index: 1;">
+              <span class="badge-tag-pill d-inline-block mb-2 location-reveal-item">{{ t('home.visitBadge') }}</span>
+              <h3 class="h4 fw-bold mb-2 section-heading location-reveal-item">{{ t('home.visitTitle') }}</h3>
+              <p class="text-muted small mb-4 location-reveal-item" style="line-height: 1.6;">
                 {{ t('home.visitDesc') }}
               </p>
 
@@ -131,7 +139,7 @@
                   <span class="studio-info-icon rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0">
                     <MapPin :size="16" />
                   </span>
-                  <div>
+                  <div class="min-w-0">
                     <div class="text-muted fw-semibold" style="font-size: 0.72rem;">{{ t('home.visitAddressLabel') }}</div>
                     <div class="fw-semibold small section-heading">{{ t('home.visitAddress') }}</div>
                   </div>
@@ -141,7 +149,7 @@
                   <span class="studio-info-icon rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0">
                     <Clock :size="16" />
                   </span>
-                  <div>
+                  <div class="min-w-0">
                     <div class="text-muted fw-semibold" style="font-size: 0.72rem;">{{ t('home.visitHoursLabel') }}</div>
                     <div class="fw-semibold small section-heading">{{ t('home.visitHours') }}</div>
                   </div>
@@ -151,7 +159,7 @@
                   <span class="studio-info-icon rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0">
                     <Phone :size="16" />
                   </span>
-                  <div>
+                  <div class="min-w-0">
                     <div class="text-muted fw-semibold" style="font-size: 0.72rem;">{{ t('home.visitPhoneLabel') }}</div>
                     <a href="tel:+85523998412" class="fw-semibold small section-heading text-decoration-none">
                       {{ t('home.visitPhone') }}
@@ -161,21 +169,21 @@
               </div>
             </div>
 
-            <div class="d-flex flex-wrap gap-2">
+            <div class="d-flex flex-wrap gap-2 location-cta-actions position-relative" style="z-index: 1;">
               <a
                 href="https://www.google.com/maps/search/?api=1&query=11.5525,104.9225"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="btn-cta-solid rounded-pill px-4 py-2 fw-bold text-decoration-none d-inline-flex align-items-center gap-2"
+                class="btn-cta-solid btn-cta-motion rounded-pill px-4 py-2 fw-bold text-decoration-none d-inline-flex align-items-center gap-2"
               >
-                <Navigation :size="15" />
+                <Navigation :size="15" class="cta-motion-icon" />
                 <span>{{ t('home.getDirections') }}</span>
               </a>
               <router-link
                 to="/booking"
-                class="btn-cta-outline rounded-pill px-4 py-2 fw-semibold text-decoration-none d-inline-flex align-items-center gap-2"
+                class="btn-cta-outline btn-cta-motion rounded-pill px-4 py-2 fw-semibold text-decoration-none d-inline-flex align-items-center gap-2"
               >
-                <Calendar :size="15" />
+                <Calendar :size="15" class="cta-motion-icon" />
                 <span>{{ t('home.ctaPrimary') }}</span>
               </router-link>
             </div>
@@ -191,7 +199,10 @@
               allowfullscreen
             ></iframe>
             <div class="map-pin-chip position-absolute bottom-0 start-0 m-3 px-3 py-2 rounded-pill d-inline-flex align-items-center gap-2">
-              <MapPin :size="14" class="text-primary flex-shrink-0" />
+              <span class="map-pulse-beacon position-relative d-inline-flex align-items-center justify-content-center" aria-hidden="true">
+                <span class="map-pulse-ring"></span>
+                <MapPin :size="14" class="text-primary flex-shrink-0 position-relative" />
+              </span>
               <span class="small fw-semibold">42 Orchid Blossom Ave · BKK1</span>
             </div>
           </div>
@@ -202,10 +213,55 @@
 </template>
 
 <script setup>
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Star, ChevronDown, CheckCircle2, MapPin, Clock, Phone, Navigation, Calendar } from '@lucide/vue'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useI18n } from '../../../../composables/useI18n'
 
+gsap.registerPlugin(ScrollTrigger)
+
 const { t } = useI18n()
+
+const sectionRef = ref(null)
+const reviewsRowRef = ref(null)
+const faqSplitRef = ref(null)
+const locationCardRef = ref(null)
+
+const cardSpot = ref({ x: 24, y: 42, active: false })
+let spotRafPending = false
+let spotRafId = null
+let nextSpotX = 24
+let nextSpotY = 42
+let gsapCtx = null
+
+const locationSpotlightStyle = computed(() => ({
+  '--card-spot-x': `${cardSpot.value.x.toFixed(1)}%`,
+  '--card-spot-y': `${cardSpot.value.y.toFixed(1)}%`,
+  '--card-spot-opacity': cardSpot.value.active ? '1' : '0'
+}))
+
+const onLocationPointerMove = (e) => {
+  const el = locationCardRef.value
+  if (!el) return
+  const rect = el.getBoundingClientRect()
+  if (!rect.width || !rect.height) return
+  nextSpotX = ((e.clientX - rect.left) / rect.width) * 100
+  nextSpotY = ((e.clientY - rect.top) / rect.height) * 100
+  cardSpot.value.active = true
+  if (spotRafPending) return
+  spotRafPending = true
+  spotRafId = requestAnimationFrame(() => {
+    cardSpot.value.x = nextSpotX
+    cardSpot.value.y = nextSpotY
+    spotRafPending = false
+    spotRafId = null
+  })
+}
+
+const onLocationPointerLeave = () => {
+  cardSpot.value.active = false
+}
 
 const reviews = [
   {
@@ -246,6 +302,140 @@ const faqs = [
     a: 'Orders over $100 qualify for complimentary express delivery, or you can pick up your order free at our salon counter during your visit.'
   }
 ]
+
+onMounted(() => {
+  gsapCtx = gsap.context(() => {
+    const mm = gsap.matchMedia()
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      if (reviewsRowRef.value) {
+        gsap.from('.reveal-review-col', {
+          scrollTrigger: {
+            trigger: reviewsRowRef.value,
+            start: 'top 86%',
+            once: true
+          },
+          y: 26,
+          opacity: 0,
+          duration: 0.65,
+          stagger: 0.1,
+          ease: 'power3.out',
+          clearProps: 'transform,opacity'
+        })
+      }
+
+      if (faqSplitRef.value) {
+        gsap.from('.faq-details', {
+          scrollTrigger: {
+            trigger: faqSplitRef.value,
+            start: 'top 85%',
+            once: true
+          },
+          x: -18,
+          opacity: 0,
+          duration: 0.55,
+          stagger: 0.08,
+          ease: 'power3.out',
+          clearProps: 'transform,opacity'
+        })
+
+        gsap.from('.cta-showcase-card', {
+          scrollTrigger: {
+            trigger: faqSplitRef.value,
+            start: 'top 85%',
+            once: true
+          },
+          y: 26,
+          opacity: 0,
+          duration: 0.7,
+          ease: 'power3.out',
+          clearProps: 'transform,opacity'
+        })
+      }
+
+      if (locationCardRef.value) {
+        const locTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: locationCardRef.value,
+            start: 'top 84%',
+            once: true
+          }
+        })
+
+        locTl
+          .from(locationCardRef.value, {
+            y: 30,
+            opacity: 0,
+            duration: 0.65,
+            ease: 'power3.out',
+            clearProps: 'transform,opacity'
+          })
+          .from(
+            '.location-reveal-item',
+            {
+              y: 16,
+              opacity: 0,
+              duration: 0.48,
+              stagger: 0.07,
+              ease: 'power3.out',
+              clearProps: 'transform,opacity'
+            },
+            '-=0.4'
+          )
+          .from(
+            '.studio-info-row',
+            {
+              x: -20,
+              opacity: 0,
+              duration: 0.52,
+              stagger: 0.09,
+              ease: 'power3.out',
+              clearProps: 'transform,opacity'
+            },
+            '-=0.3'
+          )
+          .from(
+            '.location-cta-actions',
+            {
+              y: 14,
+              opacity: 0,
+              duration: 0.45,
+              ease: 'power3.out',
+              clearProps: 'transform,opacity'
+            },
+            '-=0.25'
+          )
+          .from(
+            '.map-embed-col',
+            {
+              scale: 0.97,
+              opacity: 0,
+              duration: 0.65,
+              ease: 'power3.out',
+              clearProps: 'transform,opacity'
+            },
+            0.15
+          )
+          .from(
+            '.map-pin-chip',
+            {
+              y: 18,
+              scale: 0.88,
+              opacity: 0,
+              duration: 0.55,
+              ease: 'back.out(1.7)',
+              clearProps: 'transform,opacity'
+            },
+            '-=0.25'
+          )
+      }
+    })
+  }, sectionRef.value)
+})
+
+onUnmounted(() => {
+  if (spotRafId) cancelAnimationFrame(spotRafId)
+  if (gsapCtx) gsapCtx.revert()
+})
 </script>
 
 <style scoped>
@@ -421,6 +611,12 @@ const faqs = [
 .studio-info-row {
   background-color: var(--surface-ground, #f8fafc);
   border: 1px solid var(--border-clr, #e2e8f0);
+  transition: border-color 0.22s ease, background-color 0.22s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.studio-info-row:hover {
+  border-color: var(--primary-color-border, rgba(234, 122, 56, 0.35));
+  background-color: var(--storefront-surface, #ffffff);
 }
 
 .studio-info-icon {
@@ -429,6 +625,43 @@ const faqs = [
   background-color: var(--primary-color-soft);
   color: var(--primary-color, #EA7A38);
   border: 1px solid var(--primary-color-border);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.22s ease, color 0.22s ease;
+}
+
+.studio-info-row:hover .studio-info-icon {
+  background-color: var(--primary-color, #EA7A38);
+  color: #ffffff;
+}
+
+.location-card-spotlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: var(--card-spot-opacity, 0);
+  background: radial-gradient(
+    420px circle at var(--card-spot-x, 24%) var(--card-spot-y, 42%),
+    color-mix(in srgb, var(--primary-color, #EA7A38) 12%, transparent),
+    transparent 68%
+  );
+  transition: opacity 0.3s ease;
+}
+
+.location-ambient-orb {
+  position: absolute;
+  top: -70px;
+  left: -70px;
+  width: 240px;
+  height: 240px;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--primary-color, #EA7A38) 20%, transparent),
+    transparent 70%
+  );
+  filter: blur(26px);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .map-embed-col {
@@ -456,6 +689,124 @@ const faqs = [
   background-color: var(--storefront-surface, #ffffff);
   color: var(--text-heading-color, #0f172a);
   border: 1px solid var(--border-clr, #e2e8f0);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s ease;
+}
+
+.map-pin-chip:hover {
+  border-color: var(--primary-color, #EA7A38);
+}
+
+.map-pulse-beacon {
+  width: 18px;
+  height: 18px;
+}
+
+.map-pulse-ring {
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  background-color: color-mix(in srgb, var(--primary-color, #EA7A38) 28%, transparent);
+  opacity: 0;
+}
+
+.btn-cta-motion {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cta-motion-icon {
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .review-card,
+  .cta-showcase-card {
+    transition: border-color 0.2s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .review-card:hover,
+  .cta-showcase-card:hover {
+    transform: translateY(-3px);
+  }
+
+  .studio-info-row:hover {
+    transform: translateX(5px);
+  }
+
+  .studio-info-row:hover .studio-info-icon {
+    transform: scale(1.1) rotate(-6deg);
+  }
+
+  .btn-cta-motion:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn-cta-motion:active {
+    transform: translateY(0) scale(0.97);
+  }
+
+  .btn-cta-motion:hover .cta-motion-icon {
+    transform: translate(2px, -1px) scale(1.08);
+  }
+
+  .location-ambient-orb {
+    animation: locationOrbFloat 11s ease-in-out infinite alternate;
+  }
+
+  .map-pin-chip {
+    animation: pinChipFloat 4.2s ease-in-out infinite;
+  }
+
+  .map-pin-chip:hover {
+    animation-play-state: paused;
+    transform: translateY(-3px);
+  }
+
+  .map-pulse-ring {
+    animation: mapPulseBeacon 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+}
+
+:global(html[data-background-shapes="false"]) .location-ambient-orb,
+:global(html[data-background-shapes="false"]) .map-pin-chip,
+:global(html[data-background-shapes="false"]) .map-pulse-ring {
+  animation: none !important;
+}
+
+@keyframes locationOrbFloat {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate3d(32px, 24px, 0) scale(1.18);
+    opacity: 1;
+  }
+}
+
+@keyframes pinChipFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes mapPulseBeacon {
+  0% {
+    transform: scale(0.75);
+    opacity: 0.75;
+  }
+  75%,
+  100% {
+    transform: scale(1.85);
+    opacity: 0;
+  }
 }
 
 [data-theme="dark"] .salon-map-iframe {

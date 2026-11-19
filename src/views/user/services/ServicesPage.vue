@@ -45,39 +45,61 @@
 
         <!-- 2. SECTION: ALL SALON SERVICES -->
         <div class="template-section">
-          <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-3">
-            <h1 class="section-title fw-bold m-0">{{ t('services.allTitle') }}</h1>
-
-            <div class="d-flex align-items-center gap-3">
-              <div class="search-input-pill position-relative">
-                <Search :size="14" class="search-icon text-muted" />
-                <input
-                  type="search"
-                  v-model="searchQuery"
-                  :placeholder="t('services.searchPlaceholder')"
-                  :aria-label="t('services.searchPlaceholder')"
-                  class="form-control form-control-sm rounded-pill ps-4 pe-3 border"
-                />
-              </div>
-
-              <button type="button" class="btn btn-link text-decoration-none p-0 small fw-semibold text-muted" @click="resetFilters">
-                {{ t('services.viewAll') }}
-              </button>
+          <!-- Section Header: Title, Count Badge & Reset Action -->
+          <div class="services-header-row d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+            <div class="d-flex align-items-center gap-2">
+              <h1 class="section-title fw-bold m-0">{{ t('services.allTitle') }}</h1>
+              <span class="services-count-badge">{{ filteredServices.length }}</span>
             </div>
+
+            <button
+              v-if="isFilterActive"
+              type="button"
+              class="btn-reset-filters d-inline-flex align-items-center gap-1"
+              @click="resetFilters"
+            >
+              <RotateCcw :size="13" />
+              <span>{{ t('services.viewAll') }}</span>
+            </button>
           </div>
 
-          <!-- Category Filter Pills -->
-          <div class="d-flex flex-wrap gap-2 mb-4">
-            <button
-              v-for="cat in categories"
-              :key="cat"
-              type="button"
-              class="btn-cat-filter"
-              :class="{ active: selectedCategory === cat }"
-              @click="selectedCategory = cat"
-            >
-              {{ cat }}
-            </button>
+          <!-- Modern Search & Horizontal Filter Bar -->
+          <div class="services-filter-box rounded-4 p-3 mb-4">
+            <!-- Full-Width Responsive Search Bar -->
+            <div class="services-search-wrapper position-relative mb-3">
+              <Search :size="16" class="search-icon" />
+              <input
+                type="search"
+                v-model="searchQuery"
+                :placeholder="t('services.searchPlaceholder')"
+                :aria-label="t('services.searchPlaceholder')"
+                class="form-control services-search-input rounded-pill shadow-none"
+              />
+              <button
+                v-if="searchQuery"
+                type="button"
+                class="btn-clear-search border-0 bg-transparent p-0 d-flex align-items-center justify-content-center"
+                @click="searchQuery = ''"
+                aria-label="Clear search"
+              >
+                <X :size="15" />
+              </button>
+            </div>
+
+            <!-- Horizontal Scrollable Category Filter Pills -->
+            <div class="categories-scroll-track d-flex flex-nowrap align-items-center gap-2">
+              <button
+                v-for="cat in categories"
+                :key="cat"
+                type="button"
+                class="btn-cat-filter rounded-pill text-nowrap d-inline-flex align-items-center gap-1"
+                :class="{ active: selectedCategory === cat }"
+                @click="selectedCategory = cat"
+              >
+                <span class="cat-pill-icon" aria-hidden="true">{{ getCategoryIcon(cat) }}</span>
+                <span>{{ cat }}</span>
+              </button>
+            </div>
           </div>
 
           <!-- All Services 4-Column Grid -->
@@ -154,7 +176,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ChevronLeft, ChevronRight, Search, CheckCircle2, CalendarPlus } from '@lucide/vue'
+import { ChevronLeft, ChevronRight, Search, CheckCircle2, CalendarPlus, RotateCcw, X } from '@lucide/vue'
 import { useServices } from '../../../composables/useServices'
 import { useI18n } from '../../../composables/useI18n'
 import ServiceCard from '../../../components/ServiceCard.vue'
@@ -167,6 +189,21 @@ const selectedCategory = ref('All')
 const searchQuery = ref('')
 const selectedService = ref(null)
 const recentRowRef = ref(null)
+
+const getCategoryIcon = (cat) => {
+  switch (cat) {
+    case 'Hair Styling': return '✂️'
+    case 'Head & Scalp Spa': return '🌿'
+    case 'Facial & Skin': return '🌸'
+    case 'Nails & Beauty': return '💅'
+    case 'VIP Packages': return '👑'
+    default: return '✨'
+  }
+}
+
+const isFilterActive = computed(() => {
+  return selectedCategory.value !== 'All' || searchQuery.value.trim().length > 0
+})
 
 const isPreviewOpen = ref(false)
 const previewService = ref(null)
@@ -234,7 +271,7 @@ onMounted(() => {
 }
 
 .section-title {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   letter-spacing: -0.02em;
   color: var(--text-heading-color, #0f172a);
 }
@@ -248,42 +285,126 @@ onMounted(() => {
   cursor: pointer;
 }
 
+.services-count-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 9999px;
+  background: var(--primary-color-soft);
+  border: 1px solid var(--primary-color-border);
+  color: var(--primary-color, #EA7A38);
+}
+
+.btn-reset-filters {
+  background: transparent;
+  border: 1px solid var(--primary-color-border);
+  color: var(--primary-color, #EA7A38);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background-color: var(--primary-color-soft);
+  transition: all 0.18s ease;
+}
+
+.btn-reset-filters:hover {
+  background-color: var(--primary-color, #EA7A38);
+  color: #ffffff;
+}
+
+.services-filter-box {
+  background-color: var(--storefront-surface, #ffffff);
+  border: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0);
+}
+
+.services-search-wrapper {
+  width: 100%;
+}
+
+.services-search-input {
+  height: 42px;
+  padding-left: 40px;
+  padding-right: 38px;
+  background-color: var(--surface-ground, #f8fafc);
+  border: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0);
+  color: var(--text-heading-color, #0f172a);
+  font-size: 0.86rem;
+  transition: all 0.18s ease;
+}
+
+.services-search-input:focus {
+  background-color: var(--storefront-surface, #ffffff);
+  border-color: var(--primary-color, #EA7A38);
+  box-shadow: 0 0 0 3px var(--primary-color-soft) !important;
+}
+
 .search-icon {
   position: absolute;
-  left: 11px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
+  color: var(--secondary-color, #94a3b8);
 }
 
-.search-input-pill input {
-  font-size: 0.82rem;
-  width: 220px;
-  background-color: var(--storefront-surface, #ffffff);
-  border-color: var(--border-clr, #e2e8f0);
-  color: var(--text-heading-color, #0f172a);
+.btn-clear-search {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  color: var(--secondary-color, #94a3b8);
+  transition: color 0.16s ease;
+}
+
+.btn-clear-search:hover {
+  color: var(--primary-color, #EA7A38);
+}
+
+/* Category Filter Horizontal Scroll Track (Airbnb / App style) */
+.categories-scroll-track {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+
+.categories-scroll-track::-webkit-scrollbar {
+  display: none;
 }
 
 .btn-cat-filter {
   background-color: var(--storefront-surface, #ffffff);
-  border: 1px solid var(--border-clr, #e2e8f0);
+  border: var(--border-width, 1.5px) solid var(--border-clr, #e2e8f0);
   border-radius: 9999px;
-  padding: 0.35rem 0.9rem;
-  font-size: 0.78rem;
+  padding: 0.42rem 1.05rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--text-base, #475569);
   transition: all 0.18s ease;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .btn-cat-filter:hover {
   border-color: var(--primary-color, #EA7A38);
+  color: var(--primary-color, #EA7A38);
+  background-color: var(--primary-color-soft);
 }
 
 .btn-cat-filter.active {
   background-color: var(--primary-color, #EA7A38);
   color: #ffffff;
   border-color: var(--primary-color, #EA7A38);
+  box-shadow: 0 4px 12px rgba(234, 122, 56, 0.28);
+}
+
+.cat-pill-icon {
+  font-size: 0.88rem;
+  line-height: 1;
 }
 
 .empty-services-box {

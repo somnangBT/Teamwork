@@ -533,7 +533,7 @@ onMounted(() => {
 .cart-hero-band {
   padding-top: 68px;
   padding-bottom: 12px;
-  min-height: clamp(148px, 24vw, 260px);
+  min-height: clamp(220px, 56.25vw, 300px);
   background-color: var(--storefront-surface, #ffffff);
   border-color: var(--border-clr, #e2e8f0) !important;
 }
