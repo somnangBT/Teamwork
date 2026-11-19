@@ -68,16 +68,16 @@
       </div>
 
       <!-- Date Time Picker Planner View -->
-      <div v-if="viewMode === 'picker'" class="row g-3">
+      <div v-if="viewMode === 'picker'" class="planner-layout">
         <!-- Left Column: Inline Date Picker with Dot Indicators -->
-        <div class="col-12 col-lg-4">
+        <div class="planner-sidebar-col">
           <div class="card border-0 p-3 h-100 planner-sidebar">
             <div class="d-flex align-items-center justify-content-between mb-3">
               <div class="d-flex align-items-center gap-2">
                 <CalendarDays class="text-primary" :size="20" />
                 <h5 class="fw-bold m-0 text-heading">Select Date</h5>
               </div>
-              <BaseButton type="button" variant="outline-primary" class="px-3" @click="selectTodayPlanner">
+              <BaseButton type="button" variant="outline-primary" class="btn-compact" @click="selectTodayPlanner">
                 Today
               </BaseButton>
             </div>
@@ -93,15 +93,38 @@
               </BaseDatePicker>
             </div>
 
-            <div class="mt-3 info-panel p-3 rounded-3">
-              <div class="d-flex align-items-center gap-2 text-primary mb-2">
-                <Info :size="16" />
-                <span class="fw-bold small">Schedule Overview</span>
+            <!-- Mobile quick jump button: visible on screens < 768px -->
+            <div class="d-block d-md-none mt-2">
+              <BaseButton
+                type="button"
+                variant="primary"
+                class="w-100 justify-content-center btn-compact"
+                @click="scrollToBookings"
+              >
+                <span>View {{ plannerBookings.length }} Appointment{{ plannerBookings.length === 1 ? '' : 's' }}</span>
+                <ArrowDown :size="15" />
+              </BaseButton>
+            </div>
+
+            <!-- Collapsible schedule overview -->
+            <div class="mt-3 info-panel p-2.5 p-sm-3 rounded-3">
+              <div
+                class="d-flex align-items-center justify-content-between cursor-pointer"
+                @click="isShiftInfoOpen = !isShiftInfoOpen"
+                role="button"
+                tabindex="0"
+              >
+                <div class="d-flex align-items-center gap-2 text-primary">
+                  <Info :size="15" />
+                  <span class="fw-bold small">Schedule Overview</span>
+                </div>
+                <ChevronDown :size="15" class="text-muted transition-transform" :class="{ 'rotate-180': isShiftInfoOpen }" />
               </div>
-              <p class="text-muted small mb-2">
-                Select any highlighted date dot to inspect appointments, or switch to All Dates to view every active reservation.
-              </p>
-              <div class="pt-2 mt-2 d-flex flex-column gap-1">
+
+              <div v-show="isShiftInfoOpen" class="pt-2 mt-2 border-top d-flex flex-column gap-1">
+                <p class="text-muted text-xs mb-2">
+                  Select any highlighted date dot to inspect appointments, or switch to All Dates.
+                </p>
                 <div class="d-flex align-items-center justify-content-between text-xs">
                   <span class="text-muted">Morning Shift:</span>
                   <span class="fw-semibold text-heading">09:00 AM – 11:30 AM</span>
@@ -120,44 +143,45 @@
         </div>
 
         <!-- Right Column: Selected Date Details & Cards -->
-        <div class="col-12 col-lg-8">
-          <div class="card border-0 p-3 h-100 planner-details">
+        <div class="planner-details-col" id="planner-bookings-section">
+          <div class="card border-0 p-3 p-md-4 h-100 planner-details">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-1">
               <div class="d-flex align-items-center gap-3">
                 <div
                   class="date-badge text-center p-2 rounded-3 bg-primary-soft text-primary"
-                  style="width: 56px; flex-shrink: 0;"
+                  style="width: 52px; flex-shrink: 0;"
                 >
-                  <span class="d-block fw-bold fs-5">{{ getDayOfMonth(selectedPlannerDate) }}</span>
-                  <span class="d-block text-uppercase" style="font-size: 0.7rem; font-weight: 700;">
+                  <span class="d-block fw-bold fs-5 lh-1">{{ getDayOfMonth(selectedPlannerDate) }}</span>
+                  <span class="d-block text-uppercase mt-1" style="font-size: 0.68rem; font-weight: 700;">
                     {{ getMonthName(selectedPlannerDate) }}
                   </span>
                 </div>
                 <div>
                   <div class="d-flex align-items-center gap-2">
-                    <h4 class="fw-bold mb-0 text-heading">
+                    <h5 class="fw-bold mb-0 text-heading">
                       {{ showAllPlannerDates ? 'All Scheduled Appointments' : 'Daily Appointments' }}
-                    </h4>
+                    </h5>
                     <span class="badge bg-primary-soft text-primary rounded-pill px-2">
                       {{ plannerBookings.length }}
                     </span>
                   </div>
-                  <p class="text-muted small mb-0 mt-1">
+                  <p class="text-muted small mb-0 mt-0.5">
                     {{ showAllPlannerDates ? 'Showing appointments across all dates' : formatFriendlyDate(selectedPlannerDate) }}
                   </p>
                 </div>
               </div>
 
-              <div class="d-flex align-items-center gap-2 flex-wrap">
+              <div class="d-flex align-items-center gap-2 flex-wrap ms-auto">
                 <BaseButton
                   type="button"
-                  :variant="showAllPlannerDates ? 'primary' : 'outline-primary'"
+                  variant="outline-primary"
+                  class="btn-compact"
                   @click="showAllPlannerDates = !showAllPlannerDates"
                 >
-                  {{ showAllPlannerDates ? 'Filter by Selected Date' : `Show All Dates (${filteredBookings.length})` }}
+                  {{ showAllPlannerDates ? 'Filter Selected Date' : `Show All Dates (${filteredBookings.length})` }}
                 </BaseButton>
-                <BaseButton variant="primary" @click="openCreateModalForDate(selectedPlannerDate)">
-                  <Plus :size="16" />
+                <BaseButton variant="primary" class="btn-compact" @click="openCreateModalForDate(selectedPlannerDate)">
+                  <Plus :size="15" />
                   <span>Book This Date</span>
                 </BaseButton>
               </div>
@@ -180,11 +204,11 @@
                 Pick a dotted date on the calendar, view all dates, or schedule a new client now.
               </p>
               <div class="d-flex justify-content-center gap-2 flex-wrap">
-                <BaseButton type="button" variant="outline-primary" @click="showAllPlannerDates = true">
+                <BaseButton type="button" variant="outline-primary" class="btn-compact" @click="showAllPlannerDates = true">
                   View All ({{ filteredBookings.length }})
                 </BaseButton>
-                <BaseButton variant="primary" @click="openCreateModalForDate(selectedPlannerDate)">
-                  <Plus :size="16" />
+                <BaseButton variant="primary" class="btn-compact" @click="openCreateModalForDate(selectedPlannerDate)">
+                  <Plus :size="15" />
                   <span>New Appointment</span>
                 </BaseButton>
               </div>
@@ -195,11 +219,11 @@
 
       <!-- Full-Month Calendar View -->
       <div v-else class="row g-3 align-items-start">
-        <div class="col-12 col-xl-8">
+        <div class="col-12 col-lg-7 col-xl-8">
           <BookingCalendar :bookings="filteredBookings" @select-booking="openEditModal" />
         </div>
-        <div class="col-12 col-xl-4">
-          <div class="planner-details p-3 d-flex flex-column gap-3">
+        <div class="col-12 col-lg-5 col-xl-4">
+          <div class="planner-details p-3 p-md-4 d-flex flex-column gap-3">
             <div class="d-flex align-items-center justify-content-between">
               <h5 class="fw-bold m-0 text-heading">Upcoming Appointments</h5>
               <span class="badge bg-primary-soft text-primary rounded-pill px-2">
@@ -301,7 +325,7 @@
 
 <script setup>
 import { ref, reactive, computed } from 'vue'
-import { Plus, Search, Clock, CalendarDays, Info, X, Trash2 } from '@lucide/vue'
+import { Plus, Search, Clock, CalendarDays, Info, X, Trash2, ChevronDown, ArrowDown } from '@lucide/vue'
 import { useBooking } from '@/composables/useBooking'
 import { useServices } from '@/composables/useServices'
 import { useToastStore } from '@/stores/toast'
@@ -325,6 +349,11 @@ const searchQuery = ref('')
 const filterDate = ref('')
 const selectedPlannerDate = ref(getLocalTodayStr())
 const showAllPlannerDates = ref(false)
+const isShiftInfoOpen = ref(true)
+
+const scrollToBookings = () => {
+  document.getElementById('planner-bookings-section')?.scrollIntoView({ behavior: 'smooth' })
+}
 
 const filterOptions = computed(() => {
   const count = (status) => bookings.value.filter(b => (b.status || 'Confirmed') === status).length
@@ -536,6 +565,55 @@ const deleteEditingBooking = () => {
 </script>
 
 <style scoped>
+.planner-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .planner-layout {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 1.25rem;
+  }
+
+  .planner-sidebar-col {
+    width: 320px;
+    flex-shrink: 0;
+  }
+
+  .planner-details-col {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .planner-sidebar-col {
+    width: 350px;
+  }
+}
+
+.btn-compact {
+  height: 36px !important;
+  padding-inline: 14px !important;
+  font-size: 13.5px !important;
+  gap: 6px !important;
+}
+
+.transition-transform {
+  transition: transform 0.2s ease;
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
 .planner-sidebar,
 .planner-details {
   background-color: var(--body-bg-color);

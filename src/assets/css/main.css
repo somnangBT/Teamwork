@@ -8,9 +8,35 @@ html {
 body {
     background-color: var(--body-bg-color, #ffffff);
     color: var(--text-base, #334155);
-    font-family: 'Poppins', 'Kantumruy Pro', 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Kantumruy Pro', 'Noto Sans Khmer', 'Poppins', 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+    letter-spacing: normal;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+:lang(km),
+[lang="km"] {
+    font-family: 'Kantumruy Pro', 'Noto Sans Khmer', sans-serif !important;
+    letter-spacing: normal !important;
+    word-break: break-word;
+    line-height: 1.55;
+}
+
+:lang(km) h1,
+:lang(km) h2,
+:lang(km) h3,
+:lang(km) h4,
+:lang(km) h5,
+:lang(km) h6,
+[lang="km"] h1,
+[lang="km"] h2,
+[lang="km"] h3,
+[lang="km"] h4,
+[lang="km"] h5,
+[lang="km"] h6 {
+    font-family: 'Kantumruy Pro', 'Noto Sans Khmer', sans-serif !important;
+    letter-spacing: normal !important;
+    line-height: 1.38;
 }
 
 body.tnak-theme {
@@ -110,7 +136,8 @@ h4,
 h5,
 h6,
 .brand-icon {
-    font-family: 'Poppins', 'Kantumruy Pro', 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Kantumruy Pro', 'Noto Sans Khmer', 'Poppins', 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+    letter-spacing: normal;
 }
 
 .text-primary {
@@ -464,20 +491,12 @@ section {
 
 /* Custom Max-Width App Container */
 .app-container {
-    width: calc(100% - 32px);
+    width: 100%;
     max-width: 1248px;
     margin-left: auto;
     margin-right: auto;
-    padding-left: 0;
-    padding-right: 0;
-}
-
-@media (max-width: 576px) {
-    .app-container {
-        width: 100%;
-        padding-left: 16px;
-        padding-right: 16px;
-    }
+    padding-left: clamp(16px, 2.5vw, 24px);
+    padding-right: clamp(16px, 2.5vw, 24px);
 }
 
 /* PrimeVue Overrides (Border-driven, Zero Shadow) */
