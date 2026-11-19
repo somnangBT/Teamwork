@@ -4,14 +4,7 @@
       <div class="row g-4">
         <!-- Brand & Newsletter -->
         <div class="col-12 col-lg-4">
-          <router-link to="/" class="d-inline-flex align-items-center gap-2 text-decoration-none mb-3">
-            <svg width="32" height="32" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-              <rect x="2" y="2" width="36" height="36" rx="12" fill="#EA7A38" />
-              <path d="M20 9C17.4 13.6 17.4 19.6 20 25C22.6 19.6 22.6 13.6 20 9Z" fill="#fff" />
-              <path d="M19.5 24.5C15.5 23.2 11.8 19.5 10.6 15.2C14.7 15.8 18.2 19.2 19.5 24.5Z" fill="#fff" fill-opacity="0.92" />
-              <path d="M20.5 24.5C24.5 23.2 28.2 19.5 29.4 15.2C25.3 15.8 21.8 19.2 20.5 24.5Z" fill="#fff" fill-opacity="0.92" />
-              <path d="M13 28.5C16.2 26.8 23.8 26.8 27 28.5" stroke="#fff" stroke-width="2" stroke-linecap="round" />
-            </svg>
+          <router-link to="/" class="d-inline-flex align-items-center text-decoration-none mb-3">
             <span class="fw-bolder fs-4 footer-brand-name">Tiki Tiki</span>
           </router-link>
           <p class="text-muted small mb-4" style="max-width: 340px; line-height: 1.6;">

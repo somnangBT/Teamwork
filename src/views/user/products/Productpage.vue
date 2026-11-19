@@ -64,8 +64,8 @@
     <main class="collection-main py-4">
       <div class="app-container">
 
-        <!-- Page Toolbar Row -->
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <!-- Page Toolbar Row (Hidden on mobile/tablet responsive, visible on desktop lg+) -->
+        <div class="product-page-toolbar d-none d-lg-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
           <div class="d-flex align-items-center gap-2">
             <h2 class="page-title fs-5 fw-bold m-0">{{ selectedCategory === 'All' ? t('nav.products') : selectedCategory }}</h2>
             <span class="badge-count">{{ filteredProducts.length }}</span>
@@ -395,7 +395,7 @@ onUnmounted(() => {
 
 .product-hero-band {
   padding: 68px 0 16px;
-  min-height: clamp(148px, 24vw, 260px);
+  min-height: clamp(220px, 56.25vw, 300px);
   background-color: var(--storefront-surface, #ffffff);
   border-color: var(--border-clr, #e2e8f0) !important;
 }
@@ -422,7 +422,7 @@ onUnmounted(() => {
 
 .product-hero-heading {
   color: var(--primary-color, #EA7A38);
-  font-size: clamp(0.95rem, 2.7vw, 2.2rem);
+  font-size: clamp(1rem, 2.7vw, 2.2rem);
   letter-spacing: -0.025em;
   line-height: 1.25;
   overflow-wrap: break-word;
@@ -444,8 +444,8 @@ onUnmounted(() => {
 .product-hero-gallery {
   display: grid;
   grid-template-columns: 136fr 176fr 152fr;
-  gap: clamp(5px, 1.25vw, 16px);
-  inline-size: clamp(156px, 47%, 496px);
+  gap: clamp(6px, 1.5vw, 16px);
+  inline-size: clamp(176px, 50%, 496px);
   flex-shrink: 0;
 }
 

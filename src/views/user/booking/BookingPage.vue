@@ -294,73 +294,56 @@
     <!-- BOOKING REQUEST MODAL -->
     <BaseModal v-model="showBookingModal" title="Book Salon Service" size="md">
       <form @submit.prevent="submitBookingModalForm">
-        <!-- Row 1: Service & Specialist -->
-        <div class="row g-3 mb-3">
-          <div class="col-md-6">
-            <BaseSelect
-              v-model="modalForm.serviceId"
-              label="Service Treatment"
-              required
-              :options="allServices.map(s => ({ label: `${s.title} ($${s.price})`, value: s.id }))"
-            />
+        <!-- Service Summary Card (when booked from Services) or Selector -->
+        <div class="mb-3">
+          <div
+            v-if="selectedModalService && !isChangingService"
+            class="selected-service-pill rounded-3 p-2 px-3 d-flex align-items-center justify-content-between gap-3"
+          >
+            <div class="d-flex align-items-center gap-3 min-w-0">
+              <img
+                :src="selectedModalService.image"
+                :alt="selectedModalService.title"
+                class="selected-service-thumb rounded-2 object-fit-cover flex-shrink-0"
+              />
+              <div class="min-w-0">
+                <div class="fw-bold small heading-text text-truncate">{{ selectedModalService.title }}</div>
+                <div class="text-muted" style="font-size: 0.76rem;">
+                  <strong class="text-primary">${{ selectedModalService.price }}</strong> · {{ selectedModalService.duration }}
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn btn-link btn-sm text-decoration-none p-0 fw-semibold text-primary flex-shrink-0"
+              @click="isChangingService = true"
+            >
+              Change
+            </button>
           </div>
-          <div class="col-md-6">
-            <BaseSelect
-              v-model="modalForm.specialistId"
-              label="Specialist Stylist"
-              required
-              :options="specialists.map(spec => ({ label: `${spec.name}`, value: spec.id }))"
-            />
-          </div>
+
+          <BaseSelect
+            v-else
+            v-model="modalForm.serviceId"
+            label="Service Treatment"
+            required
+            :options="allServices.map(s => ({ label: `${s.title} ($${s.price})`, value: s.id }))"
+          />
         </div>
 
-        <!-- Row 2: Beauty Profile Selection -->
-        <div class="row g-3 mb-3">
-          <div class="col-md-6">
-            <BaseSelect
-              v-model="selectedPetId"
-              label="Beauty Profile"
-              :options="[
-                ...pets.map(p => ({ label: `${p.name} (${p.breed})`, value: p.id })),
-                { label: '+ Enter custom care preference', value: 'custom' }
-              ]"
-            />
-          </div>
-          <div class="col-md-6">
-            <BaseInput
-              v-model="modalForm.petName"
-              label="Style / Care Focus"
-              placeholder="e.g. Soft Layered Waves"
-              required
-              :disabled="selectedPetId !== 'custom' && pets.length > 0"
-            />
-          </div>
+        <!-- Specialist -->
+        <div class="mb-3">
+          <BaseSelect
+            v-model="modalForm.specialistId"
+            label="Specialist Stylist"
+            required
+            :options="specialists.map(spec => ({ label: spec.name, value: spec.id }))"
+          />
         </div>
 
-        <!-- Row 3: Client Name & Email -->
+        <!-- Booking Date & Preferred Time -->
         <div class="row g-3 mb-3">
-          <div class="col-md-6">
-            <BaseInput
-              v-model="modalForm.customerName"
-              label="Client Full Name"
-              placeholder="Enter client name"
-              required
-            />
-          </div>
-          <div class="col-md-6">
-            <BaseInput
-              v-model="modalForm.customerEmail"
-              label="Email Address"
-              type="email"
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-        </div>
-
-        <!-- Row 4: Booking Date & Session -->
-        <div class="row g-3 mb-3">
-          <div class="col-md-6">
+          <div class="col-12 col-sm-6">
             <BaseDatePicker
               v-model="modalForm.date"
               label="Booking Date"
@@ -368,50 +351,37 @@
               placeholder="Select appointment date..."
             />
           </div>
-          <div class="col-md-6">
-            <BaseSelect
-              v-model="modalForm.session"
-              label="Session"
-              required
-              :options="[
-                { label: 'Morning (09:00 - 11:30)', value: 'MORNING' },
-                { label: 'Afternoon (01:00 - 04:00)', value: 'AFTERNOON' },
-                { label: 'Evening (05:00 - 07:00)', value: 'EVENING' }
-              ]"
-            />
-          </div>
-        </div>
-
-        <!-- Row 5: Start Time & Phone -->
-        <div class="row g-3 mb-3">
-          <div class="col-md-6">
+          <div class="col-12 col-sm-6">
             <BaseSelect
               v-model="modalForm.time"
               label="Preferred Time"
               required
-              :options="activeModalTimeSlots.map(slot => ({ label: slot, value: slot }))"
-            />
-          </div>
-          <div class="col-md-6">
-            <BaseInput
-              v-model="modalForm.customerPhone"
-              label="Phone Number"
-              type="tel"
-              placeholder="Enter phone number"
-              required
+              :options="allTimeSlotsFlat.map(slot => ({ label: slot, value: slot }))"
             />
           </div>
         </div>
 
-        <!-- Row 6: Note -->
-        <div class="mb-4">
+        <!-- Optional Notes -->
+        <div class="mb-3">
           <BaseInput
             type="textarea"
-            :rows="3"
+            :rows="2"
             v-model="modalForm.note"
-            label="Special Care Notes"
-            placeholder="Hair or skin sensitivities, desired finish, or suite preferences (optional)"
+            label="Notes (Optional)"
+            placeholder="Sensitivities or styling preferences..."
           />
+        </div>
+
+        <!-- Logged-in Account Auto-fill Chip -->
+        <div class="booking-account-chip rounded-3 px-3 py-2 mb-4 d-flex align-items-center justify-content-between gap-2 small">
+          <span class="d-flex align-items-center gap-2 min-w-0 text-muted">
+            <UserCheck :size="14" class="text-primary flex-shrink-0" />
+            <span class="text-truncate">
+              Booking as <strong class="heading-text">{{ loggedInClient.name }}</strong>
+              <span v-if="loggedInClient.phone"> · {{ loggedInClient.phone }}</span>
+            </span>
+          </span>
+          <span class="text-muted flex-shrink-0" style="font-size: 0.72rem;">{{ t('booking.payAtSalon') }}</span>
         </div>
 
         <div class="d-flex justify-content-end gap-2 pt-3 border-top">
@@ -476,7 +446,7 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, watch, onMounted } from 'vue'
+import { ref, computed, reactive, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   Filter, LayoutGrid, List, CalendarPlus, CalendarX, Clock,
@@ -486,9 +456,11 @@ import { useBooking } from '../../../composables/useBooking'
 import { useServices } from '../../../composables/useServices'
 import { useProfile } from '../../../composables/useProfile'
 import { useI18n } from '../../../composables/useI18n'
+import { useAuthStore } from '../../../stores/auth'
 import { useToastStore } from '../../../stores/toast'
 
 const route = useRoute()
+const authStore = useAuthStore()
 const toastStore = useToastStore()
 const { t } = useI18n()
 const { account, pets } = useProfile()
@@ -518,22 +490,15 @@ const filterDate = ref('')
 const showBookingModal = ref(false)
 const showCancelModal = ref(false)
 const showRescheduleModal = ref(false)
+const isChangingService = ref(false)
 const bookingToCancel = ref(null)
 const bookingToReschedule = ref(null)
-
-const selectedPetId = ref(pets.value[0]?.id || 'custom')
 
 const modalForm = reactive({
   serviceId: null,
   specialistId: null,
   date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
-  session: 'MORNING',
-  time: '10:00 AM',
-  petName: pets.value[0]?.name || '',
-  petBreed: pets.value[0]?.breed || '',
-  customerName: account.value.name || 'Guest Client',
-  customerPhone: account.value.phone || '+855 12 000 000',
-  customerEmail: account.value.email || 'guest@example.com',
+  time: '09:00 AM',
   note: ''
 })
 
@@ -548,31 +513,15 @@ const allTimeSlotsFlat = computed(() => [
   ...(timeSlots.evening || [])
 ])
 
-const activeModalTimeSlots = computed(() => {
-  if (modalForm.session === 'MORNING') return timeSlots.morning || []
-  if (modalForm.session === 'AFTERNOON') return timeSlots.afternoon || []
-  if (modalForm.session === 'EVENING') return timeSlots.evening || []
-  return timeSlots.morning || []
+const selectedModalService = computed(() => {
+  return allServices.value.find(item => item.id === Number(modalForm.serviceId)) || null
 })
 
-watch(() => modalForm.session, () => {
-  if (!activeModalTimeSlots.value.includes(modalForm.time)) {
-    modalForm.time = activeModalTimeSlots.value[0] || '09:00 AM'
-  }
-})
-
-watch(selectedPetId, (petId) => {
-  if (petId === 'custom') {
-    modalForm.petName = ''
-    modalForm.petBreed = ''
-  } else {
-    const pet = pets.value.find(p => p.id === petId)
-    if (pet) {
-      modalForm.petName = pet.name
-      modalForm.petBreed = pet.breed
-    }
-  }
-})
+const loggedInClient = computed(() => ({
+  name: authStore.fullName || account.value.name || 'Guest Client',
+  email: authStore.user?.email || account.value.email || 'guest@example.com',
+  phone: authStore.user?.phone || account.value.phone || ''
+}))
 
 const filteredBookings = computed(() => {
   let list = [...bookings.value]
@@ -597,33 +546,23 @@ const canModifyBooking = (status) => {
 const openBookingModal = (service = null, specialistIdParam = null) => {
   const chosenService = service || allServices.value[0]
   if (chosenService) modalForm.serviceId = chosenService.id
+  isChangingService.value = !service
 
   const matchedSpec = specialistIdParam
     ? specialists.value.find(s => String(s.id) === String(specialistIdParam))
     : specialists.value[0]
   modalForm.specialistId = matchedSpec ? matchedSpec.id : specialists.value[0]?.id
 
-  modalForm.customerName = account.value.name || 'Guest Client'
-  modalForm.customerPhone = account.value.phone || ''
-  modalForm.customerEmail = account.value.email || ''
-
-  if (pets.value.length > 0) {
-    selectedPetId.value = pets.value[0].id
-    modalForm.petName = pets.value[0].name
-    modalForm.petBreed = pets.value[0].breed
-  } else {
-    selectedPetId.value = 'custom'
-  }
-
-  if (activeModalTimeSlots.value.length > 0) {
-    modalForm.time = activeModalTimeSlots.value[0]
+  if (allTimeSlotsFlat.value.length > 0 && !allTimeSlotsFlat.value.includes(modalForm.time)) {
+    modalForm.time = allTimeSlotsFlat.value[0]
   }
   showBookingModal.value = true
 }
 
 const submitBookingModalForm = () => {
-  const s = allServices.value.find(item => item.id === Number(modalForm.serviceId)) || allServices.value[0]
+  const s = selectedModalService.value || allServices.value[0]
   const spec = specialists.value.find(item => String(item.id) === String(modalForm.specialistId)) || specialists.value[0]
+  const primaryProfile = pets.value[0]
 
   const created = createBooking({
     serviceId: s.id,
@@ -635,11 +574,11 @@ const submitBookingModalForm = () => {
     specialistAvatar: spec.avatar,
     date: modalForm.date,
     time: modalForm.time,
-    petName: modalForm.petName,
-    petBreed: modalForm.petBreed || 'Beauty Care',
-    customerName: modalForm.customerName,
-    customerPhone: modalForm.customerPhone,
-    customerEmail: modalForm.customerEmail,
+    petName: primaryProfile?.name || '',
+    petBreed: primaryProfile?.breed || 'Beauty Care',
+    customerName: loggedInClient.value.name,
+    customerPhone: loggedInClient.value.phone,
+    customerEmail: loggedInClient.value.email,
     notes: modalForm.note,
     status: 'Confirmed'
   })
@@ -829,5 +768,20 @@ onMounted(() => {
 
 .btn-tnak-link-cal:hover {
   text-decoration: underline;
+}
+
+.selected-service-pill {
+  background-color: var(--primary-color-soft, rgba(234, 122, 56, 0.1));
+  border: 1px solid var(--primary-color-border, rgba(234, 122, 56, 0.3));
+}
+
+.selected-service-thumb {
+  width: 44px;
+  height: 44px;
+}
+
+.booking-account-chip {
+  background-color: var(--surface-ground, #f1f5f9);
+  border: 1px solid var(--border-clr, #e2e8f0);
 }
 </style>
